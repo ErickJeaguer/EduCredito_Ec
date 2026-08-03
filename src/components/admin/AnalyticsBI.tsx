@@ -5,7 +5,7 @@ import type { LoanApplication } from '../../types/credit';
 import { 
   BarChart3, TrendingUp, Download, FileText, AlertTriangle, 
   CheckCircle2, DollarSign, PieChart, Users, Award, Percent,
-  ArrowUpRight, ArrowDownRight, Building2, Printer
+  ArrowUpRight, ArrowDownRight, Building2, Printer, ShieldCheck
 } from 'lucide-react';
 
 interface AnalyticsBIProps {
@@ -274,48 +274,57 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn font-sans">
       
-      {/* BARRA DE BOTONES DE EXPORTACIÓN Y REPORTES INMEDIATOS */}
-      <div className="p-6 rounded-xl bg-slate-900 text-white dark:bg-slate-900/90 border border-slate-800 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-800">
-            Módulo Institucional • Business Intelligence
-          </span>
-          <h3 className="text-xl font-bold mt-2 flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-emerald-400" />
-            Centro de Auditoría y Control Financiero UTB
-          </h3>
-          <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            Monitorea en tiempo real la solvencia del fondo cooperativa rotativo, analiza patrones de comportamiento estudiantil por facultad y descarga reportes formales compatibles con Microsoft Excel y formatos de impresión PDF.
-          </p>
+      {/* TARJETA PRINCIPAL Y BARRA DE REPORTES INMEDIATOS - DISEÑO SOBRIO Y OPTIMIZADO */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div className="space-y-2 max-w-3xl w-full">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 text-[11px] font-bold uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Módulo Institucional • Business Intelligence</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Centro de Auditoría y Control Financiero UTB
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed pt-1">
+              Monitorea en tiempo real la solvencia del fondo cooperativo rotativo, analiza patrones de comportamiento estudiantil por facultad y descarga reportes formales compatibles con Microsoft Excel y formatos de impresión PDF.
+            </p>
+          </div>
+          <div className="text-right shrink-0 hidden md:block">
+            <span className="text-xs text-slate-400 block font-medium">Estado del Motor Analítico</span>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Sincronización en vivo
+            </span>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
+        {/* BOTONES DE ACCIÓN Y EXPORTACIÓN - FILA INFERIOR BIEN ESPACIADA */}
+        <div className="pt-6 border-t border-slate-200 dark:border-slate-800/80 flex flex-wrap items-center justify-start gap-3">
           <button
             type="button"
             onClick={() => exportToExcelCSV(false)}
-            className="h-9 px-4 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5 active:scale-95"
+            className="h-10 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs transition transform active:scale-95 flex items-center gap-2"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-4 h-4" />
             <span>Exportar Cartera (Excel/CSV)</span>
           </button>
 
           <button
             type="button"
             onClick={() => exportToExcelCSV(true)}
-            className="h-9 px-3.5 rounded-lg border border-amber-500/60 bg-amber-950/40 hover:bg-amber-900/50 text-amber-300 text-xs font-semibold transition flex items-center gap-1.5 active:scale-95"
+            className="h-10 px-4 rounded-xl bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800 font-semibold text-xs transition transform active:scale-95 flex items-center gap-2"
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             <span>Alerta Morosos (CSV)</span>
           </button>
 
           <button
             type="button"
             onClick={generateExecutivePDFReport}
-            className="h-9 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition flex items-center gap-1.5 active:scale-95"
+            className="h-10 px-5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium text-xs transition transform active:scale-95 flex items-center gap-2"
           >
-            <Printer className="w-3.5 h-3.5 text-slate-300" />
+            <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             <span>Imprimir Resumen (PDF)</span>
           </button>
         </div>
@@ -325,13 +334,13 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
         {/* Pilar 1: Tasa de Recuperación */}
-        <div className="p-6 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Tasa de Recuperación (TRC)</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+            <span className="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Tasa de Recuperación (TRC)</span>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
               metrics.recoveryRate >= 80 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
             }`}>
-              {metrics.recoveryRate >= 80 ? 'SALUD ÓPTIMA' : 'ESTABLE'}
+              {metrics.recoveryRate >= 80 ? 'Óptima' : 'Estable'}
             </span>
           </div>
           <div>
@@ -340,10 +349,10 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
                 {metrics.recoveryRate.toFixed(1)}%
               </span>
               <span className="text-xs text-emerald-600 font-bold flex items-center">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +2.4% sem
+                <ArrowUpRight className="w-3.5 h-3.5" /> +2.4%
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               ${metrics.recoveredCapital.toFixed(2)} USD retornados en cuotas
             </p>
           </div>
@@ -353,13 +362,13 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
         </div>
 
         {/* Pilar 2: Índice de Morosidad Institucional (IMI) */}
-        <div className="p-6 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Índice de Morosidad (IMI)</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+            <span className="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Índice de Morosidad (IMI)</span>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
               metrics.delinquencyRate <= 5 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
             }`}>
-              {metrics.delinquencyRate <= 5 ? 'RIESGO MÍNIMO' : 'ATENCIÓN REQUERIDA'}
+              {metrics.delinquencyRate <= 5 ? 'Bajo Riesgo' : 'Atención'}
             </span>
           </div>
           <div>
@@ -367,10 +376,10 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
               <span className={`text-3xl font-black tracking-tight ${metrics.delinquencyRate > 5 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
                 {metrics.delinquencyRate.toFixed(1)}%
               </span>
-              <span className="text-xs text-slate-500 font-medium">del capital activo</span>
+              <span className="text-xs text-slate-500 font-medium">de la cartera</span>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
-              ${metrics.overdueCapital.toFixed(2)} USD impagados tras fecha límite
+            <p className="text-xs text-slate-500 mt-1">
+              ${metrics.overdueCapital.toFixed(2)} USD impagados en fecha límite
             </p>
           </div>
           <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
@@ -379,42 +388,46 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
         </div>
 
         {/* Pilar 3: Capital Dispersado */}
-        <div className="p-6 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Capital en Circulación</span>
-            <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400 opacity-80" />
-          </div>
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 flex flex-col justify-between">
           <div>
-            <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              ${metrics.totalDisbursed.toFixed(0)} <span className="text-sm font-normal text-slate-500">USD</span>
-            </span>
-            <p className="text-[11px] text-slate-500 mt-1.5">
-              En {metrics.activeCount + metrics.paidCount} microcréditos universitarios
-            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Capital en Circulación</span>
+              <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400 opacity-80" />
+            </div>
+            <div className="mt-4">
+              <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                ${metrics.totalDisbursed.toFixed(0)} <span className="text-sm font-normal text-slate-500">USD</span>
+              </span>
+              <p className="text-xs text-slate-500 mt-1.5">
+                En {metrics.activeCount + metrics.paidCount} microcréditos universitarios
+              </p>
+            </div>
           </div>
-          <div className="pt-2 text-[11px] font-semibold text-blue-600 dark:text-blue-400 border-t border-slate-100 dark:border-slate-800/80 flex justify-between">
+          <div className="pt-3 text-xs font-semibold text-blue-600 dark:text-blue-400 border-t border-slate-100 dark:border-slate-800/80 flex justify-between">
             <span>Promedio por crédito:</span>
             <span>${((metrics.totalDisbursed / (metrics.activeCount + metrics.paidCount || 1))).toFixed(2)} USD</span>
           </div>
         </div>
 
         {/* Pilar 4: Fondo de Reserva Cooperatorio */}
-        <div className="p-6 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Fondo Reserva Cooperatorio</span>
-            <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400 opacity-80" />
-          </div>
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 flex flex-col justify-between">
           <div>
-            <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-              +${metrics.accruedInterest.toFixed(2)} <span className="text-sm font-normal text-slate-500">USD</span>
-            </span>
-            <p className="text-[11px] text-slate-500 mt-1.5">
-              Generado por tasa solidaria del 8.5% anual
-            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Reserva Cooperatorio</span>
+              <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400 opacity-80" />
+            </div>
+            <div className="mt-4">
+              <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                +${metrics.accruedInterest.toFixed(2)} <span className="text-sm font-normal text-slate-500">USD</span>
+              </span>
+              <p className="text-xs text-slate-500 mt-1.5">
+                Generado por tasa solidaria del 8.5% anual
+              </p>
+            </div>
           </div>
-          <div className="pt-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80 flex justify-between">
-            <span>Destino de reserva:</span>
-            <span className="text-emerald-700 dark:text-emerald-400">Becas y Fondo de Contingencia</span>
+          <div className="pt-3 text-xs font-semibold text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80 flex justify-between">
+            <span>Destino:</span>
+            <span className="text-emerald-700 dark:text-emerald-400">Becas y Fondo Contingencia</span>
           </div>
         </div>
       </div>
@@ -423,7 +436,7 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* GRÁFICO 1: DISTRIBUCIÓN POR FACULTAD / CARRERA (2 Columnas) */}
-        <div className="lg:col-span-2 p-6 sm:p-8 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+        <div className="lg:col-span-2 p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
               <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block tracking-wider">Análisis Demográfico</span>
@@ -481,13 +494,13 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
             </div>
           )}
 
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between mt-4">
-            <span>💡 <b>Recomendación BI:</b> Fomentar talleres de educación financiera estudiantil en las facultades con mayor porcentaje de solicitud y morosidad.</span>
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between mt-4">
+            <span>💡 <b>Recomendación de BI:</b> Fomentar talleres de educación financiera estudiantil en las facultades con mayor porcentaje de solicitud y morosidad.</span>
           </div>
         </div>
 
         {/* GRÁFICO 2: AUDITORÍA DE SCORING Y ESTADO DE SOLICITUDES (1 Columna) */}
-        <div className="p-6 sm:p-8 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 flex flex-col justify-between">
+        <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 flex flex-col justify-between">
           <div className="space-y-6">
             <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
               <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block tracking-wider">Salud y Selección</span>
@@ -522,28 +535,28 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
               </div>
 
               <div className="grid grid-cols-2 gap-2.5 pt-2 text-xs">
-                <div className="p-2.5 rounded bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
                     <span className="w-2.5 h-2.5 rounded-sm bg-emerald-600 block" /> Activos/Pagados
                   </span>
                   <span className="font-bold text-slate-900 dark:text-white">{metrics.activeCount + metrics.paidCount}</span>
                 </div>
 
-                <div className="p-2.5 rounded bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
                     <span className="w-2.5 h-2.5 rounded-sm bg-amber-500 block" /> En Revisión
                   </span>
                   <span className="font-bold text-slate-900 dark:text-white">{metrics.pendingCount}</span>
                 </div>
 
-                <div className="p-2.5 rounded bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
                     <span className="w-2.5 h-2.5 rounded-sm bg-rose-600 block" /> En Mora
                   </span>
                   <span className="font-bold text-rose-600 dark:text-rose-400">{metrics.overdueCount}</span>
                 </div>
 
-                <div className="p-2.5 rounded bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
                   <span className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
                     <span className="w-2.5 h-2.5 rounded-sm bg-slate-500 block" /> Rechazados
                   </span>
@@ -557,9 +570,9 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
               <h5 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wide">
                 Correlación Scoring Académico
               </h5>
-              <div className="flex items-center justify-between text-xs bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-lg border border-emerald-200 dark:border-emerald-900/40">
+              <div className="flex items-center justify-between text-xs bg-emerald-50 dark:bg-emerald-950/30 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/40">
                 <div>
-                  <span className="font-bold text-slate-900 dark:text-white block">Promedio de Aprobados</span>
+                  <span className="font-bold text-slate-900 dark:text-white block">Promedio Aprobados</span>
                   <span className="text-[11px] text-emerald-700 dark:text-emerald-400">Umbral reglamentario cumplido</span>
                 </div>
                 <span className="text-xl font-black text-emerald-700 dark:text-emerald-400 font-mono">
@@ -567,10 +580,10 @@ export const AnalyticsBI: React.FC<AnalyticsBIProps> = ({ allLoans }) => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-xs bg-slate-100 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between text-xs bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div>
-                  <span className="font-medium text-slate-700 dark:text-slate-300 block">Promedio de Rechazados</span>
-                  <span className="text-[11px] text-slate-500">Por debajo de exigencia académica</span>
+                  <span className="font-medium text-slate-700 dark:text-slate-300 block">Promedio Rechazados</span>
+                  <span className="text-[11px] text-slate-500">Por debajo del nivel académico</span>
                 </div>
                 <span className="text-base font-bold text-slate-600 dark:text-slate-400 font-mono">
                   {metrics.avgGradeRejected.toFixed(2)} / 10
