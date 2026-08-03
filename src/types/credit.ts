@@ -13,6 +13,7 @@ export interface InstallmentItem {
   remainingBalance: number; // Saldo residual luego del pago
   isPaid: boolean;          // Estado de liquidación de la cuota
   paidAt?: string;          // Timestamp ISO del momento del pago
+  receiptReference?: string; // Número de referencia del comprobante digital bancario
 }
 
 export interface LoanApplication {
@@ -43,3 +44,18 @@ export interface LoanApplication {
   updatedAt: string;        // Último cambio de estado o pago
   rejectionReason?: string; // Motivo en caso de rechazo administrativo
 }
+
+export interface PaymentReceipt {
+  referenceNumber: string;    // Código de auditoría (Ej: UTB-REC-2026-89421)
+  loanId: string;
+  studentName: string;
+  studentCedula: string;
+  weekNumber: number;
+  amount: number;
+  principal: number;
+  interest: number;
+  paidAt: string;
+  remainingLoanBalance: number;
+  status: 'CUOTA ABONADA CON ÉXITO' | 'CRÉDITO TOTALMENTE LIQUIDADO';
+}
+

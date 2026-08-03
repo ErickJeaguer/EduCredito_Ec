@@ -13,11 +13,12 @@ import {
   demoSimulateOverdue,
   type VerifiedGuarantor 
 } from '../../lib/firebase/loans';
-import type { LoanApplication } from '../../types/credit';
+import type { LoanApplication, PaymentReceipt } from '../../types/credit';
 import { ThemeToggleButton } from '../../components/theme/ThemeProvider';
+import { ReceiptModal } from '../../components/payments/ReceiptModal';
 import { 
   GraduationCap, LogOut, Wallet, Clock, AlertTriangle, 
-  ChevronRight, FileText, Loader2, DollarSign, Check, Play, UserCheck, AlertCircle, ShieldAlert
+  ChevronRight, FileText, Loader2, DollarSign, Check, Play, UserCheck, AlertCircle, ShieldAlert, Receipt
 } from 'lucide-react';
 
 export default function StudentDashboardPage() {
@@ -42,8 +43,10 @@ export default function StudentDashboardPage() {
   const [activeRestriction, setActiveRestriction] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedLoanForDetails, setSelectedLoanForDetails] = useState<string | null>(null);
+  const [activeReceipt, setActiveReceipt] = useState<PaymentReceipt | null>(null);
 
   useEffect(() => {
+
     if (!loading && !authUser && !profile) {
       router.replace('/login');
     }
@@ -106,14 +109,34 @@ export default function StudentDashboardPage() {
 
   const handleSimulatePayment = async (loanId: string, index: number) => {
     const res = await simulateInstallmentPayment(loanId, index);
-    if (res.success) {
-      alert('Abono de cuota semanal de lunes registrado.');
+    if (res.success && res.receipt) {
+      setActiveReceipt(res.receipt);
+    } else if (res.success) {
+      alert('Abono de cuota semanal de lunes registrado exitosamente.');
     } else {
       alert('Error al simular pago: ' + res.error);
     }
   };
 
+  const handleShowExistingReceipt = (loan: LoanApplication, inst: any) => {
+    const receipt: PaymentReceipt = {
+      referenceNumber: inst.receiptReference || `UTB-REC-${new Date().getFullYear()}-AUDITADO`,
+      loanId: loan.id || 'N/A',
+      studentName: loan.studentName,
+      studentCedula: loan.studentCedula,
+      weekNumber: inst.weekNumber,
+      amount: inst.amount,
+      principal: inst.principal,
+      interest: inst.interest,
+      paidAt: inst.paidAt || loan.updatedAt || new Date().toISOString(),
+      remainingLoanBalance: inst.remainingBalance,
+      status: 'CUOTA ABONADA CON ÉXITO',
+    };
+    setActiveReceipt(receipt);
+  };
+
   const handleDemoApprove = async (loanId: string) => {
+
     await demoApproveLoan(loanId);
     alert('Modo Demo: Préstamo aprobado de inmediato por secretaría simulada.');
   };
@@ -509,17 +532,19 @@ export default function StudentDashboardPage() {
                             </thead>
                             <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                               {loan.installments.map((inst, idx) => (
-                                <tr key={inst.weekNumber} className={`hover:bg-slate-50 dark:hover:bg-slate-900/50 transition ${inst.isPaid ? 'opacity-60' : ''}`}>
+                                <tr key={inst.weekNumber} className={`hover:bg-slate-50 dark:hover:bg-slate-900/50 transition ${inst.isPaid ? 'bg-emerald-500/5 dark:bg-emerald-950/20' : ''}`}>
                                   <td className="py-2.5 px-3 font-semibold">Semana {inst.weekNumber}</td>
-                                  <td className="py-2.5 px-3">{inst.dueDate}</td>
-                                  <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-white">${inst.amount.toFixed(2)}</td>
+                                  <td className="py-2.5 px-3 font-medium">{inst.dueDate}</td>
+                                  <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-white font-mono">${inst.amount.toFixed(2)}</td>
                                   <td className="py-2.5 px-3">
                                     {inst.isPaid ? (
-                                      <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                                      <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-[11px]">
                                         ✓ Liquidada
                                       </span>
                                     ) : (
-                                      <span className="text-amber-700 dark:text-amber-400 font-medium">Pendiente de abono</span>
+                                      <span className="inline-flex items-center text-amber-700 dark:text-amber-400 font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/50 text-[11px]">
+                                        Pendiente
+                                      </span>
                                     )}
                                   </td>
                                   <td className="py-2.5 px-3 text-right">
@@ -527,12 +552,18 @@ export default function StudentDashboardPage() {
                                       <button
                                         type="button"
                                         onClick={() => handleSimulatePayment(loan.id!, idx)}
-                                        className="h-7 px-3 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs transition"
+                                        className="h-7 px-3 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs transition transform active:scale-95 flex items-center gap-1 ml-auto"
                                       >
-                                        Pagar cuota simular
+                                        <DollarSign className="w-3.5 h-3.5" /> Pagar Cuota
                                       </button>
                                     ) : (
-                                      <span className="text-slate-400 font-mono text-[11px]">Pagada</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleShowExistingReceipt(loan, inst)}
+                                        className="h-7 px-2.5 rounded-md border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-medium text-[11px] transition inline-flex items-center gap-1"
+                                      >
+                                        <Receipt className="w-3 h-3" /> Ver Recibo
+                                      </button>
                                     )}
                                   </td>
                                 </tr>
@@ -619,6 +650,9 @@ export default function StudentDashboardPage() {
         )}
 
       </main>
+
+      {/* Modal de Comprobante de Caja Cooperativa UTB */}
+      <ReceiptModal receipt={activeReceipt} onClose={() => setActiveReceipt(null)} />
     </div>
   );
 }

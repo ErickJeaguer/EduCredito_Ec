@@ -2,9 +2,10 @@
 
 import { collection, doc, addDoc, updateDoc, getDoc, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import { db } from './client';
-import type { LoanApplication, LoanStatus } from '../../types/credit';
+import type { LoanApplication, LoanStatus, PaymentReceipt } from '../../types/credit';
 import { generateAmortizationSchedule } from '../financial/amortization';
 import type { UserProfile } from '../../types/user';
+
 
 export interface VerifiedGuarantor {
   uid: string;
@@ -233,9 +234,9 @@ export function subscribeToGuaranteedDebts(userId: string, callback: (debts: Loa
 }
 
 /**
- * Simula el pago de una cuota semanal o permite activar un préstamo para pruebas en el prototipo de la UTB.
+ * Simula el pago de una cuota semanal y genera el recibo institucional digital de la UTB.
  */
-export async function simulateInstallmentPayment(loanId: string, installmentIndex: number): Promise<{ success: boolean; error?: string }> {
+export async function simulateInstallmentPayment(loanId: string, installmentIndex: number): Promise<{ success: boolean; error?: string; receipt?: PaymentReceipt }> {
   try {
     const docRef = doc(db, 'loans', loanId);
     const docSnap = await getDoc(docRef);
@@ -250,10 +251,14 @@ export async function simulateInstallmentPayment(loanId: string, installmentInde
       return { success: false, error: 'Número de cuota inválido.' };
     }
 
+    const refNumber = `UTB-REC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const nowIso = new Date().toISOString();
+
     installments[installmentIndex] = {
       ...installments[installmentIndex],
       isPaid: true,
-      paidAt: new Date().toISOString(),
+      paidAt: nowIso,
+      receiptReference: refNumber,
     };
 
     // Si con esta cuota se pagaron todas, el estado general cambia de inmediato a 'paid'
@@ -263,15 +268,30 @@ export async function simulateInstallmentPayment(loanId: string, installmentInde
     await updateDoc(docRef, {
       installments,
       status: newStatus,
-      updatedAt: new Date().toISOString(),
+      updatedAt: nowIso,
     });
 
-    return { success: true };
+    const receipt: PaymentReceipt = {
+      referenceNumber: refNumber,
+      loanId: loanId,
+      studentName: data.studentName,
+      studentCedula: data.studentCedula,
+      weekNumber: installments[installmentIndex].weekNumber,
+      amount: installments[installmentIndex].amount,
+      principal: installments[installmentIndex].principal,
+      interest: installments[installmentIndex].interest,
+      paidAt: nowIso,
+      remainingLoanBalance: allPaid ? 0 : installments[installmentIndex].remainingBalance,
+      status: allPaid ? 'CRÉDITO TOTALMENTE LIQUIDADO' : 'CUOTA ABONADA CON ÉXITO',
+    };
+
+    return { success: true, receipt };
   } catch (error) {
     console.error('Error al procesar pago simulado:', error);
     return { success: false, error: 'Fallo al registrar el abono en la base de datos.' };
   }
 }
+
 
 /**
  * Helper especial para demostraciones en vivo: Permite al estudiante o evaluador aprobar un préstamo pendiente o simular mora.
