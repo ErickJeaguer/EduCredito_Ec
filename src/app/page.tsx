@@ -83,7 +83,7 @@ export default function LandingPage() {
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight sm:leading-[1.15]">
             Microcréditos Universitarios <br className="hidden sm:inline" />
-            <span className="text-emerald-700 dark:text-emerald-400 bg-clip-text">Justos, Claros y Sin Buró Comercial.</span>
+            <span className="text-emerald-700 dark:text-emerald-400 bg-clip-text">Justos, Claros y Sin Buró de Crédito.</span>
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
