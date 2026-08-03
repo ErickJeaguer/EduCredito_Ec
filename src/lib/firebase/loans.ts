@@ -306,3 +306,63 @@ export async function demoSimulateOverdue(loanId: string): Promise<{ success: bo
     return { success: false };
   }
 }
+
+/**
+ * ADMINISTRADOR: Escucha en tiempo real (Live Snapshot) TODOS los préstamos del fondo universitario.
+ */
+export function subscribeToAllLoans(callback: (loans: LoanApplication[]) => void): () => void {
+  const loansRef = collection(db, 'loans');
+  
+  return onSnapshot(loansRef, (snap) => {
+    const loans: LoanApplication[] = snap.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...(docSnap.data() as Omit<LoanApplication, 'id'>),
+    }));
+    // Ordenar por fecha decreciente en el cliente
+    loans.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    callback(loans);
+  }, (error) => {
+    console.error('Error al escuchar todas las solicitudes en portal Admin:', error);
+    callback([]);
+  });
+}
+
+/**
+ * ADMINISTRADOR: Aprueba una solicitud de microcrédito y la pasa a estado activo.
+ */
+export async function adminApproveLoan(loanId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const docRef = doc(db, 'loans', loanId);
+    await updateDoc(docRef, {
+      status: 'active',
+      rejectionReason: null,
+      updatedAt: new Date().toISOString(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Error administrativo al aprobar crédito:', error);
+    return { success: false, error: 'No se pudo actualizar el estado de aprobación en el servidor.' };
+  }
+}
+
+/**
+ * ADMINISTRADOR: Rechaza una solicitud de microcrédito especificando un mensaje con el motivo.
+ */
+export async function adminRejectLoan(loanId: string, rejectionReason: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (!rejectionReason || !rejectionReason.trim()) {
+      return { success: false, error: 'Es obligatorio especificar un motivo de rechazo para notificar al estudiante.' };
+    }
+    const docRef = doc(db, 'loans', loanId);
+    await updateDoc(docRef, {
+      status: 'rejected',
+      rejectionReason: rejectionReason.trim(),
+      updatedAt: new Date().toISOString(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Error administrativo al rechazar crédito:', error);
+    return { success: false, error: 'No se pudo registrar el rechazo en el servidor.' };
+  }
+}
+

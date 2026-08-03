@@ -192,6 +192,33 @@ export default function StudentDashboardPage() {
           </div>
         )}
 
+        {/* ALERTA DE SOLICITUD RECHAZADA POR ADMINISTRATORIA */}
+        {myLoans.filter(l => l.status === 'rejected').map(rej => (
+          <div key={rej.id} className="p-4 sm:p-5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 text-slate-900 dark:text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800 dark:text-rose-400 block">
+                  Dictamen de la Secretaría Administrativa de Créditos
+                </span>
+                <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                  Tu solicitud de microcrédito por ${rej.requestedAmount}.00 USD no ha sido aprobada
+                </p>
+                <div className="mt-2 p-3 rounded-lg bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 text-xs text-slate-700 dark:text-slate-300">
+                  <span className="font-bold text-rose-700 dark:text-rose-400">Motivo oficial devuelto por el administrador:</span>
+                  <p className="mt-0.5 leading-relaxed font-medium">"{rej.rejectionReason || 'La documentación o garante no cumple temporalmente con los requisitos institucionales del fondo.'}"</p>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setActiveTab('simulator')}
+              className="h-9 px-4 rounded-lg bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold shrink-0 transition shadow-xs"
+            >
+              Corregir y postular de nuevo
+            </button>
+          </div>
+        ))}
+
         {/* FICHA ACADÉMICA Y ESTADO */}
         <div className="p-6 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -383,11 +410,13 @@ export default function StudentDashboardPage() {
                             <span className={`px-2.5 py-0.5 rounded text-[11px] font-semibold ${
                               loan.status === 'active' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' :
                               loan.status === 'pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' :
+                              loan.status === 'rejected' ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-bold' :
                               loan.status === 'overdue' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 font-bold' :
                               'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
                             }`}>
-                              {loan.status === 'active' ? '● Préstamo en curso' :
+                              {loan.status === 'active' ? '● Préstamo en curso (Cobros los lunes)' :
                                loan.status === 'pending' ? '○ En revisión administrativa' :
+                               loan.status === 'rejected' ? '✕ Solicitud Devuelta / Rechazada' :
                                loan.status === 'overdue' ? '⚠️ En mora (Reportado a garante)' :
                                '✓ Liquidado / Pagado'}
                             </span>
@@ -405,6 +434,17 @@ export default function StudentDashboardPage() {
                           <p className="text-slate-500 mt-0.5 text-[11px]">Promedio reportado: <b>{loan.previousSemesterGrade || '---'}</b></p>
                         </div>
                       </div>
+
+                      {/* Mensaje de rechazo dentro del historial de créditos */}
+                      {loan.status === 'rejected' && loan.rejectionReason && (
+                        <div className="p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-slate-800 dark:text-slate-200 flex items-start gap-2.5">
+                          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-rose-800 dark:text-rose-300 block">Observación oficial de secretaría para esta solicitud:</span>
+                            <p className="mt-0.5 leading-relaxed font-medium">{loan.rejectionReason}</p>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Progreso de Abonos */}
                       <div className="space-y-2">
