@@ -51,43 +51,44 @@ export default function LandingPage() {
       <section className="relative px-6 pt-20 pb-28 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0E1422]">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold border border-emerald-300/60 dark:border-emerald-800">
-            <Award className="w-3.5 h-3.5" />
-            <span>Sistema Financiero Cooperativo Oficial de Estudiantes UTB</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold border border-emerald-300/60 dark:border-emerald-800">
+            <Award className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>Tu comunidad te respalda: Microcréditos exclusivos para estudiantes.</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight sm:leading-[1.15]">
-            Microcréditos universitarios <br className="hidden sm:inline" />
-            <span className="text-emerald-700 dark:text-emerald-400">justos, claros y sin buró comercial.</span>
+            Microcréditos Universitarios <br className="hidden sm:inline" />
+            <span className="text-emerald-700 dark:text-emerald-400">Justos, Claros y Sin Buró Comercial.</span>
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Un fondo solidario autogestionado para financiar tus materiales, libros de especialidad y viáticos académicos con cuotas fijas de lunes a lunes y tasa institucional del 8.5% anual.
+            Un fondo solidario autogestionado para financiar tus materiales, libros de especialidad y viáticos académicos. Tasa fija institucional del 8.5% anual con cuotas flexibles y transparentes.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
-              className="w-full sm:w-auto h-12 px-8 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2"
+              className="w-full sm:w-auto h-12 px-8 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 transform hover:-translate-y-0.5 duration-150"
             >
-              <span>Simular y solicitar crédito</span>
+              <span>Calcula tu cuota gratis</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/login"
               className="w-full sm:w-auto h-12 px-8 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-semibold text-sm transition flex items-center justify-center"
             >
-              Acceso portal de estudiantes
+              Ingresar a mi cuenta
             </Link>
           </div>
 
-          <div className="pt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-medium text-slate-500 dark:text-slate-400">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Verificación Registro Civil Módulo 10</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Cobros cooperativos Lunes a Lunes</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> 0% Comisiones ocultas de apertura</span>
+          <div className="pt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" /> Validación rápida con tu cédula</span>
+            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" /> Pagos flexibles a tu ritmo</span>
+            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" /> 100% transparente: Cero comisiones ocultas</span>
           </div>
         </div>
       </section>
+
 
       {/* CÓMO FUNCIONA */}
       <section id="como-funciona" className="py-24 px-6 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800">
