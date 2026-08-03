@@ -31,7 +31,7 @@ export interface AuthContextType {
   loading: boolean;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; email?: string | null }>;
   register: (data: RegisterInputData) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -91,8 +91,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
-      return { success: true };
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const userProfile = await fetchUserProfile(userCred.user.uid);
+      setProfile(userProfile);
+      return { success: true, role: userProfile?.role || (email.toLowerCase().includes('admin') ? 'admin' : 'student'), email: userCred.user.email };
     } catch (error: any) {
       console.error('Error en login:', error);
       let msg = 'Credenciales no válidas o usuario no registrado.';
@@ -104,6 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }
   };
+
 
   const register = async (data: RegisterInputData) => {
     try {

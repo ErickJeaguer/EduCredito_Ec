@@ -24,11 +24,16 @@ export default function LoginPage() {
     setIsSubmitting(false);
 
     if (result.success) {
-      router.push('/dashboard');
+      if (result.role === 'admin' || email.trim().toLowerCase() === 'admin@utb.edu.ec' || email.trim().toLowerCase().includes('admin')) {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     } else {
       setError(result.error || 'Credenciales no válidas.');
     }
   };
+
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-white dark:bg-[#090D16] transition-colors duration-300">
