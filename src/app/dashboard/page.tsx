@@ -275,11 +275,11 @@ export default function StudentDashboardPage() {
                 <div>
                   <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Cupo máximo habilitado</p>
                   <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mt-2">
-                    {activeRestriction ? '$0.00' : '$90.00'} <span className="text-xs font-semibold text-slate-500">USD</span>
+                    {activeRestriction ? '$0.00' : '$30.00'} <span className="text-xs font-semibold text-slate-500">USD</span>
                   </p>
                 </div>
                 <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mt-4">
-                  {activeRestriction ? 'Crédito en curso actualmente' : 'Cupo Nivel 3 disponible'}
+                  {activeRestriction ? 'Crédito en curso actualmente' : 'Rango disponible: $10.00 a $30.00 USD'}
                 </p>
               </div>
 

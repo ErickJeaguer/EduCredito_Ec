@@ -109,7 +109,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Elige tu cupo en línea</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Selecciona tu nivel de cupo ($30, $60 o $90 USD) y el número de semanas para devolverlo en plazos escalables de 2 a 12 semanas.
+                Escribe el monto que deseas solicitar (desde $10 hasta $30 USD) y abre la lista desplegable para seleccionar tu plazo de repago de 1 a 12 semanas.
               </p>
             </div>
 
@@ -167,31 +167,31 @@ export default function LandingPage() {
           </div>
 
           <div className="p-8 rounded-2xl bg-white dark:bg-[#090D16] border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Resumen de Cupos Oficiales</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Resumen del Fondo Estudiantil</h3>
             
             <div className="space-y-3 text-xs">
               <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-slate-900 dark:text-white">Cupo Nivel 1 - Básico</p>
-                  <p className="text-slate-500 mt-0.5">Viáticos, libros y fotocopias</p>
+                  <p className="font-bold text-slate-900 dark:text-white">Monto Mínimo Habilitado</p>
+                  <p className="text-slate-500 mt-0.5">Apoyo básico para copias e insumos</p>
                 </div>
-                <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">$30.00</span>
+                <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">$10.00</span>
               </div>
               
               <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-slate-900 dark:text-white">Cupo Nivel 2 - Estándar</p>
-                  <p className="text-slate-500 mt-0.5">Materiales técnicos e insumos</p>
+                  <p className="font-bold text-slate-900 dark:text-white">Monto Máximo Habilitado</p>
+                  <p className="text-slate-500 mt-0.5">Tope institucional por estudiante</p>
                 </div>
-                <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">$60.00</span>
+                <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">$30.00</span>
               </div>
 
               <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-slate-900 dark:text-white">Cupo Nivel 3 - Máximo</p>
-                  <p className="text-slate-500 mt-0.5">Software y proyectos universitarios</p>
+                  <p className="font-bold text-slate-900 dark:text-white">Plazos Flexibles Desplegables</p>
+                  <p className="text-slate-500 mt-0.5">Selección de cuotas para cada lunes</p>
                 </div>
-                <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">$90.00</span>
+                <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">1 a 12 Semanas</span>
               </div>
             </div>
             

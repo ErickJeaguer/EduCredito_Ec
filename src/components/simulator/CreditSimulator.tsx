@@ -16,18 +16,10 @@ interface CreditSimulatorProps {
   applicantSemester: number;
 }
 
-const ALLOWED_AMOUNTS = [
-  { value: 30, label: 'Cupo Nivel 1', desc: 'Libros, copias y viáticos semanales', tag: 'Básico' },
-  { value: 60, label: 'Cupo Nivel 2', desc: 'Materiales e insumos académicos', tag: 'Estándar' },
-  { value: 90, label: 'Cupo Nivel 3', desc: 'Software y proyectos universitarios', tag: 'Máximo' },
-];
-
-const ALLOWED_WEEKS = [2, 4, 6, 8, 10, 12];
-
 export default function CreditSimulator({ 
   onApply, isSubmitting, activeRestriction, applicantUid, applicantSemester 
 }: CreditSimulatorProps) {
-  const [amount, setAmount] = useState<number>(30);
+  const [amount, setAmount] = useState<number>(20);
   const [weeks, setWeeks] = useState<number>(4);
   const [showSchedule, setShowSchedule] = useState<boolean>(true);
   
@@ -65,6 +57,11 @@ export default function CreditSimulator({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (activeRestriction || isSubmitting) return;
+
+    if (amount < 10 || amount > 30) {
+      alert('El monto solicitado debe estar en el rango institucional de $10.00 a $30.00 USD.');
+      return;
+    }
 
     const numericGrade = parseFloat(gradeStr);
     if (isNaN(numericGrade) || numericGrade < 1 || numericGrade > 10) {
@@ -117,72 +114,80 @@ export default function CreditSimulator({
         </div>
       )}
 
-      {/* PASO 1: SELECCIÓN DE MONTO */}
+      {/* PASO 1: SELECCIÓN DE MONTO (INPUT TEXT / NUMBER) */}
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-slate-900 dark:text-white">
-          Paso 1: Selecciona el cupo en USD
+        <label htmlFor="credit-amount" className="block text-sm font-semibold text-slate-900 dark:text-white">
+          Paso 1: Escribe cuánto crédito deseas solicitar (Mínimo $10 — Máximo $30)
         </label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {ALLOWED_AMOUNTS.map((item) => {
-            const isSelected = amount === item.value;
-            return (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setAmount(item.value)}
-                className={`text-left p-5 rounded-xl border transition shadow-xs ${
-                  isSelected
-                    ? 'bg-emerald-50/50 dark:bg-emerald-950/40 border-emerald-600 dark:border-emerald-500 ring-1 ring-emerald-600'
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className={`text-[11px] font-semibold uppercase ${
-                    isSelected ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'
-                  }`}>
-                    {item.tag}
-                  </span>
-                  {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}
-                </div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                  ${item.value} <span className="text-xs font-normal text-slate-500">USD</span>
-                </p>
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mt-1">{item.label}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{item.desc}</p>
-              </button>
-            );
-          })}
+        <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 max-w-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                Ingresa en el recuadro el monto exacto para tus gastos universitarios:
+              </p>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-1">
+                Límites oficiales de la plataforma: Mínimo $10.00 USD — Máximo $30.00 USD.
+              </p>
+            </div>
+            <div className="relative shrink-0 w-48">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-base">$</span>
+              <input
+                id="credit-amount"
+                type="number"
+                min="10"
+                max="30"
+                step="1"
+                value={amount || ''}
+                disabled={!!activeRestriction}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setAmount(isNaN(val) ? 0 : val);
+                }}
+                placeholder="Ej. 20"
+                className="w-full h-11 pl-8 pr-12 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-xs text-right transition disabled:opacity-50"
+              />
+              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-semibold">USD</span>
+            </div>
+          </div>
+          {(amount < 10 || amount > 30) && (
+            <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2 font-medium">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>Por favor ingresa un monto válido dentro del rango permitido ($10 a $30 USD).</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* PASO 2: SELECCIÓN DE PLAZO */}
-      <div className="space-y-3">
+      {/* PASO 2: SELECCIÓN DE PLAZO (LISTA DESPLEGABLE) */}
+      <div className="space-y-3 max-w-2xl">
         <div className="flex justify-between items-center">
-          <label className="text-sm font-semibold text-slate-900 dark:text-white">
-            Paso 2: Plazo de repago semanal (Lunes)
+          <label htmlFor="term-weeks" className="text-sm font-semibold text-slate-900 dark:text-white">
+            Paso 2: Plazo de repago semanal (Lunes de cobro)
           </label>
           <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-            Plazo seleccionado: {weeks} Semanas
+            Plazo: {weeks} {weeks === 1 ? 'semana' : 'semanas'}
           </span>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
-          {ALLOWED_WEEKS.map((w) => {
-            const isSelected = weeks === w;
-            return (
-              <button
-                key={w}
-                type="button"
-                onClick={() => setWeeks(w)}
-                className={`py-2.5 px-3 rounded-lg text-center font-medium text-sm transition border ${
-                  isSelected
-                    ? 'bg-emerald-700 text-white border-emerald-700 font-semibold'
-                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-400'
-                }`}
-              >
-                {w} <span className="text-xs">semanas</span>
-              </button>
-            );
-          })}
+        <p className="text-xs text-slate-600 dark:text-slate-400">
+          Presiona la lista y selecciona en cuánto tiempo deseas cancelar tu microcrédito:
+        </p>
+        <div className="relative">
+          <select
+            id="term-weeks"
+            value={weeks}
+            disabled={!!activeRestriction}
+            onChange={(e) => setWeeks(Number(e.target.value))}
+            className="w-full h-11 px-4 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-xs appearance-none cursor-pointer transition disabled:opacity-50"
+          >
+            <option value={1}>1 semana (1 cuota a pagar el próximo lunes)</option>
+            <option value={2}>2 semanas (15 días — 2 cuotas los lunes)</option>
+            <option value={4}>4 semanas (1 mes — 4 cuotas los lunes)</option>
+            <option value={6}>6 semanas (1.5 meses — 6 cuotas los lunes)</option>
+            <option value={8}>8 semanas (2 meses — 8 cuotas los lunes)</option>
+            <option value={10}>10 semanas (2.5 meses — 10 cuotas los lunes)</option>
+            <option value={12}>12 semanas (3 meses — 12 cuotas los lunes)</option>
+          </select>
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
         </div>
       </div>
 
@@ -377,7 +382,7 @@ export default function CreditSimulator({
 
         <button
           type="submit"
-          disabled={!confirmed || !verifiedGuarantor || isSubmitting || !!activeRestriction}
+          disabled={!confirmed || !verifiedGuarantor || isSubmitting || !!activeRestriction || amount < 10 || amount > 30}
           className="w-full h-12 px-6 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
