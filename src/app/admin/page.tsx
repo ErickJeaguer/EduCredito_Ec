@@ -81,7 +81,7 @@ export default function AdminDashboardPage() {
     setProcessingId(null);
 
     if (res.success) {
-      alert(`✅ Crédito de ${loan.studentName} aprobado exitosamente. Se ha habilitado su cronograma de cobros para cada lunes.`);
+      alert(`✅ Crédito de ${loan.studentName} aprobado exitosamente. Se ha habilitado su cronograma de cobros semanales.`);
     } else {
       alert(`Error al aprobar: ${res.error}`);
     }
@@ -315,7 +315,7 @@ export default function AdminDashboardPage() {
                             'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
                           }`}>
                             {loan.status === 'pending' ? '○ Pendiente de Verificación Directiva' :
-                             loan.status === 'active' ? '● Desembolsado (Activo en Lunes)' :
+                             loan.status === 'active' ? '● Desembolsado y en curso' :
                              loan.status === 'rejected' ? '✕ Devuelto / Rechazado con Motivo' :
                              loan.status === 'overdue' ? '⚠️ En Mora (Reportado)' :
                              '✓ Liquidado'}
@@ -414,7 +414,7 @@ export default function AdminDashboardPage() {
                           ) : (
                             <CheckCircle2 className="w-4 h-4" />
                           )}
-                          <span>Aprobar Desembolso (Lunes a Lunes)</span>
+                          <span>Aprobar y Desembolsar Crédito</span>
                         </button>
                       </div>
                     )}

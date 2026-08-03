@@ -113,7 +113,7 @@ export default function RegisterPage() {
               Registro al Fondo Cooperativo Estudiantil
             </h1>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Completa tu ficha para acceder a microcréditos semanales de Lunes a Lunes. Tu cédula será validada automáticamente.
+              Completa tu ficha para acceder a microcréditos con cuotas semanales flexibles. Tu cédula será validada automáticamente.
             </p>
           </div>
 

@@ -64,7 +64,7 @@ export default function LoginPage() {
             </div>
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Cuotas fijas de lunes a lunes con tasa institucional del 8.5% anual.</span>
+              <span>Cuotas semanales fijas y flexibles con tasa institucional del 8.5% anual.</span>
             </div>
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />

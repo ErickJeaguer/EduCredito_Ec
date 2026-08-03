@@ -77,7 +77,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) 
               ${receipt.amount.toFixed(2)} <span className="text-lg font-normal text-slate-500">USD</span>
             </div>
             <div className="text-xs text-slate-500 mt-1">
-              Liquidación de Cuota #{receipt.weekNumber} de los Lunes
+              Liquidación de Cuota #{receipt.weekNumber} (Amortización Semanal)
             </div>
           </div>
 

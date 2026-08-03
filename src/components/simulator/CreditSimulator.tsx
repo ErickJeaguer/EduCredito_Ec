@@ -75,7 +75,7 @@ export default function CreditSimulator({
     }
 
     if (!confirmed) {
-      alert('Debes confirmar el compromiso solidario de abono en los días lunes.');
+      alert('Debes confirmar el compromiso solidario de repago semanal.');
       return;
     }
 
@@ -94,12 +94,12 @@ export default function CreditSimulator({
             Simulador y Calculadora Oficial de Créditos
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-            Tasa institucional del 8.5% anual • Cuotas semanales fijas de Lunes a Lunes con semana de gracia inicial.
+            Tasa institucional del 8.5% anual • Cuotas semanales fijas con semana de gracia inicial.
           </p>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 font-medium shrink-0">
           <TrendingUp className="w-4 h-4 text-emerald-600" />
-          <span>Cobros Lunes a Lunes</span>
+          <span>Cobros semanales programados</span>
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export default function CreditSimulator({
       <div className="space-y-3 max-w-2xl">
         <div className="flex justify-between items-center">
           <label htmlFor="term-weeks" className="text-sm font-semibold text-slate-900 dark:text-white">
-            Paso 2: Plazo de repago semanal (Lunes de cobro)
+            Paso 2: Plazo de repago semanal
           </label>
           <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
             Plazo: {weeks} {weeks === 1 ? 'semana' : 'semanas'}
@@ -179,13 +179,13 @@ export default function CreditSimulator({
             onChange={(e) => setWeeks(Number(e.target.value))}
             className="w-full h-11 px-4 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-xs appearance-none cursor-pointer transition disabled:opacity-50"
           >
-            <option value={1}>1 semana (1 cuota a pagar el próximo lunes)</option>
-            <option value={2}>2 semanas (15 días — 2 cuotas los lunes)</option>
-            <option value={4}>4 semanas (1 mes — 4 cuotas los lunes)</option>
-            <option value={6}>6 semanas (1.5 meses — 6 cuotas los lunes)</option>
-            <option value={8}>8 semanas (2 meses — 8 cuotas los lunes)</option>
-            <option value={10}>10 semanas (2.5 meses — 10 cuotas los lunes)</option>
-            <option value={12}>12 semanas (3 meses — 12 cuotas los lunes)</option>
+            <option value={1}>1 semana (1 cuota semanal)</option>
+            <option value={2}>2 semanas (15 días — 2 cuotas semanales)</option>
+            <option value={4}>4 semanas (1 mes — 4 cuotas semanales)</option>
+            <option value={6}>6 semanas (1.5 meses — 6 cuotas semanales)</option>
+            <option value={8}>8 semanas (2 meses — 8 cuotas semanales)</option>
+            <option value={10}>10 semanas (2.5 meses — 10 cuotas semanales)</option>
+            <option value={12}>12 semanas (3 meses — 12 cuotas semanales)</option>
           </select>
           <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
         </div>
@@ -290,7 +290,7 @@ export default function CreditSimulator({
             <span className="text-2xl sm:text-3xl font-bold text-emerald-400">${calculation.weeklyPaymentAmount.toFixed(2)}</span>
             <span className="text-xs text-slate-400">/ semana</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">Repagos cada lunes</p>
+          <p className="text-xs text-slate-400 mt-1">Repagos semanales</p>
         </div>
 
         <div className="border-t sm:border-t-0 sm:border-l border-slate-800 pt-4 sm:pt-0 sm:pl-6">
@@ -311,7 +311,7 @@ export default function CreditSimulator({
         </div>
 
         <div className="border-t sm:border-t-0 lg:border-l border-slate-800 pt-4 lg:pt-0 lg:pl-6">
-          <p className="text-xs text-slate-400 font-medium uppercase">Primer Lunes de cobro</p>
+          <p className="text-xs text-slate-400 font-medium uppercase">Fecha de primer pago</p>
           <div className="flex items-center gap-1.5 mt-1 text-white">
             <Calendar className="w-4 h-4 text-emerald-400" />
             <span className="text-base font-bold">{firstDateStr}</span>
@@ -320,7 +320,7 @@ export default function CreditSimulator({
         </div>
       </div>
 
-      {/* Cronograma Oficial Lunes a Lunes */}
+      {/* Cronograma Oficial de Amortización */}
       <div>
         <button
           type="button"
@@ -329,7 +329,7 @@ export default function CreditSimulator({
         >
           <span className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-emerald-600" />
-            Ver cronograma oficial de las {weeks} cuotas de Lunes
+            Ver cronograma oficial de las {weeks} cuotas semanales
           </span>
           {showSchedule ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -340,7 +340,7 @@ export default function CreditSimulator({
               <thead className="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 sticky top-0 font-semibold">
                 <tr>
                   <th className="py-2.5 px-4"># Cuota</th>
-                  <th className="py-2.5 px-4">Fecha de Lunes</th>
+                  <th className="py-2.5 px-4">Fecha de Vencimiento</th>
                   <th className="py-2.5 px-4">Capital</th>
                   <th className="py-2.5 px-4">Interés</th>
                   <th className="py-2.5 px-4 text-emerald-700 dark:text-emerald-400">Cuota (Cw)</th>
@@ -376,7 +376,7 @@ export default function CreditSimulator({
             className="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-600 bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 cursor-pointer disabled:opacity-50"
           />
           <label htmlFor="terms" className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none leading-relaxed">
-            Confirmo mi solicitud de <b>${amount} USD a {weeks} semanas</b>. Declaro la veracidad de mi promedio y acepto el compromiso solidario con la comunidad de la UTB para efectuar el abono de <b>${calculation.weeklyPaymentAmount.toFixed(2)} cada Lunes</b>. Comprendo que ante retrasos superiores a dos semanas, el saldo impago será informado y registrado en el portal de mi garante <b>{verifiedGuarantor?.fullName || 'validado'}</b>.
+            Confirmo mi solicitud de <b>${amount} USD a {weeks} semanas</b>. Declaro la veracidad de mi promedio y acepto el compromiso solidario con la comunidad de la UTB para efectuar el abono de <b>${calculation.weeklyPaymentAmount.toFixed(2)} semanales</b>. Comprendo que ante retrasos superiores a dos semanas, el saldo impago será informado y registrado en el portal de mi garante <b>{verifiedGuarantor?.fullName || 'validado'}</b>.
           </label>
         </div>
 

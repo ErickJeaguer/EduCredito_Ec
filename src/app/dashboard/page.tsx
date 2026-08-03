@@ -112,7 +112,7 @@ export default function StudentDashboardPage() {
     if (res.success && res.receipt) {
       setActiveReceipt(res.receipt);
     } else if (res.success) {
-      alert('Abono de cuota semanal de lunes registrado exitosamente.');
+      alert('Abono de cuota semanal registrado exitosamente.');
     } else {
       alert('Error al simular pago: ' + res.error);
     }
@@ -152,7 +152,7 @@ export default function StudentDashboardPage() {
     ? creditoActivo.installments.reduce((acc, curr) => !curr.isPaid ? acc + curr.amount : acc, 0)
     : 0;
   
-  const proximoLunesVencimiento = creditoActivo?.installments.find(i => !i.isPaid)?.dueDate || 'Sin cobros en cola';
+  const proximoVencimiento = creditoActivo?.installments.find(i => !i.isPaid)?.dueDate || 'Sin cobros en cola';
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#090D16] text-slate-800 dark:text-slate-100 flex flex-col transition-colors duration-300 font-sans">
@@ -202,7 +202,7 @@ export default function StudentDashboardPage() {
                   Tienes {guaranteedDebts.length} deuda(s) en mora como Garante Solidario
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                  El estudiante <b>{guaranteedDebts[0].studentName}</b> ha acumulado retrasos en sus cuotas semanales de los lunes. Revisa tus responsabilidades en la sección de garantías para prevenir restricciones en el fondo.
+                  El estudiante <b>{guaranteedDebts[0].studentName}</b> ha acumulado retrasos en sus cuotas semanales. Revisa tus responsabilidades en la sección de garantías para prevenir restricciones en el fondo.
                 </p>
               </div>
             </div>
@@ -347,9 +347,9 @@ export default function StudentDashboardPage() {
 
               <div className="p-5 rounded-xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Próximo Lunes de Repago</p>
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Próxima Fecha de Repago</p>
                   <p className="text-lg font-bold text-slate-900 dark:text-white mt-3 truncate">
-                    {proximoLunesVencimiento}
+                    {proximoVencimiento}
                   </p>
                 </div>
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-4">
@@ -437,7 +437,7 @@ export default function StudentDashboardPage() {
                               loan.status === 'overdue' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 font-bold' :
                               'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
                             }`}>
-                              {loan.status === 'active' ? '● Préstamo en curso (Cobros los lunes)' :
+                              {loan.status === 'active' ? '● Préstamo en curso (Activo)' :
                                loan.status === 'pending' ? '○ En revisión administrativa' :
                                loan.status === 'rejected' ? '✕ Solicitud Devuelta / Rechazada' :
                                loan.status === 'overdue' ? '⚠️ En mora (Reportado a garante)' :
@@ -445,7 +445,7 @@ export default function StudentDashboardPage() {
                             </span>
                           </div>
                           <h4 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
-                            ${loan.requestedAmount}.00 USD <span className="text-xs font-normal text-slate-500">en {loan.durationWeeks} cuotas de Lunes</span>
+                            ${loan.requestedAmount}.00 USD <span className="text-xs font-normal text-slate-500">en {loan.durationWeeks} cuotas semanales</span>
                           </h4>
                         </div>
 
@@ -472,7 +472,7 @@ export default function StudentDashboardPage() {
                       {/* Progreso de Abonos */}
                       <div className="space-y-2">
                         <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                          <span>Progreso del crédito: {pagadas} de {totalCuotas} lunes abonados</span>
+                          <span>Progreso del crédito: {pagadas} de {totalCuotas} cuotas abonadas</span>
                           <span className="font-semibold text-emerald-700 dark:text-emerald-400">{porcentaje}% liquidado</span>
                         </div>
                         <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
@@ -524,7 +524,7 @@ export default function StudentDashboardPage() {
                             <thead className="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 font-semibold">
                               <tr>
                                 <th className="py-2.5 px-3">Cuota #</th>
-                                <th className="py-2.5 px-3">Fecha (Lunes de repago)</th>
+                                <th className="py-2.5 px-3">Fecha de Vencimiento</th>
                                 <th className="py-2.5 px-3">Monto semanal</th>
                                 <th className="py-2.5 px-3">Estado del abono</th>
                                 <th className="py-2.5 px-3 text-right">Acción en prototipo</th>
@@ -589,7 +589,7 @@ export default function StudentDashboardPage() {
                 Deudas que Garantizo en Estado de Mora
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                En cumplimiento con el reglamento de EduCrédito UTB, cuando un estudiante al que respaldaste acumula dos semanas o más de impagos en sus lunes de cobro, el saldo impagado se notifica y refleja en esta sección de tu expediente.
+                En cumplimiento con el reglamento de EduCrédito UTB, cuando un estudiante al que respaldaste acumula dos semanas o más de impagos en sus cuotas, el saldo impagado se notifica y refleja en esta sección de tu expediente.
               </p>
             </div>
 
@@ -598,7 +598,7 @@ export default function StudentDashboardPage() {
                 <Check className="w-8 h-8 text-emerald-600 mx-auto" />
                 <h4 className="text-base font-semibold text-slate-900 dark:text-white">Sin deudas en mora bajo tu garantía</h4>
                 <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-                  Todos los compañeros universitarios a quienes diste tu respaldo solidario como garante se encuentran al día en sus pagos de los lunes.
+                  Todos los compañeros universitarios a quienes diste tu respaldo solidario como garante se encuentran al día en sus obligaciones financieras.
                 </p>
               </div>
             ) : (
@@ -634,7 +634,7 @@ export default function StudentDashboardPage() {
                         </div>
                         <div>
                           <p className="font-semibold text-slate-500 uppercase text-[10px]">Cuotas atrasadas:</p>
-                          <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{cuotasAtresadas} lunes sin pagar</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{cuotasAtresadas} cuotas sin pagar</p>
                         </div>
                       </div>
 

@@ -122,7 +122,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">Simulador Interactivo en Vivo</h3>
-                <p className="text-xs text-slate-500">Prueba cómo quedarían tus cuotas de repago para los días lunes</p>
+                <p className="text-xs text-slate-500">Prueba cómo quedarían tus cuotas de repago semanal</p>
               </div>
             </div>
             <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -166,7 +166,7 @@ export default function LandingPage() {
               {/* Plazo del crédito en semanas */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Selecciona el plazo para abonar en los días lunes:
+                  Selecciona el plazo para abonar tu microcrédito:
                 </label>
                 <select
                   value={simWeeks}
@@ -175,7 +175,7 @@ export default function LandingPage() {
                 >
                   {[1, 2, 3, 4, 6, 8, 10, 12].map((w) => (
                     <option key={w} value={w}>
-                      {w} {w === 1 ? 'semana' : 'semanas'} de plazo ({w} lunes hábiles)
+                      {w} {w === 1 ? 'semana' : 'semanas'} de plazo ({w} {w === 1 ? 'cuota semanal' : 'cuotas semanales'})
                     </option>
                   ))}
                 </select>
@@ -190,7 +190,7 @@ export default function LandingPage() {
             <div className="lg:col-span-5 p-6 rounded-xl bg-gradient-to-br from-emerald-900 to-slate-900 text-white shadow-xl flex flex-col justify-between space-y-4 border border-emerald-500/20">
               <div>
                 <span className="text-[11px] font-medium text-emerald-300 uppercase tracking-wider block">
-                  Tu cuota estimada cada lunes
+                  Tu cuota estimada por semana
                 </span>
                 <div className="text-4xl font-extrabold font-mono mt-1 tracking-tight">
                   ${weeklyInstallment.toFixed(2)} <span className="text-sm font-normal text-slate-300">/ sem</span>
@@ -270,10 +270,10 @@ export default function LandingPage() {
                 3
               </div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                Repago semanal los Lunes
+                Repago semanal flexible
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Recibe el desembolso institucional con 7 días completos de gracia inicial y realiza tus abonos obligatorios con cuotas fijas cada lunes para recuperar e incrementar tu historial.
+                Recibe el desembolso institucional con 7 días completos de gracia inicial y realiza tus abonos obligatorios con cuotas fijas semanales para recuperar e incrementar tu historial.
               </p>
             </div>
 
@@ -340,7 +340,7 @@ export default function LandingPage() {
                   </p>
                   <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300 font-medium">
                     <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> No revisamos centrales de riesgo ni burós bancarios externos.</div>
-                    <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> Liberación inmediata y renovación al cancelar tus cuotas de los lunes.</div>
+                    <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> Liberación inmediata y renovación al cancelar tus cuotas semanales.</div>
                     <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> Comprobante digital bancario descargable en cada abono realizado.</div>
                   </div>
                 </div>
@@ -388,8 +388,8 @@ export default function LandingPage() {
 
                 <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                   <div>
-                    <p className="font-bold text-slate-900 dark:text-white">Repago Cooperativo los Lunes</p>
-                    <p className="text-slate-500 mt-0.5">Sincronizado con tus viáticos semanales</p>
+                    <p className="font-bold text-slate-900 dark:text-white">Plazo Cooperativo Semanal</p>
+                    <p className="text-slate-500 mt-0.5">Sincronizado con tus viáticos académicos</p>
                   </div>
                   <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">1 a 12 Semanas</span>
                 </div>
@@ -422,8 +422,8 @@ export default function LandingPage() {
           <div className="space-y-3">
             {[
               {
-                q: "¿Por qué el repago es exclusivamente en los días lunes?",
-                a: "La estructura 'Lunes a Lunes' está calculada para coincidir con la asignación semanal de viáticos académicos que reciben los estudiantes universitarios. Además, el sistema te otorga 7 días exactos de gracia desde el desembolso antes de tu primera cuota hábil."
+                q: "¿Cómo funciona el calendario del repago semanal?",
+                a: "El calendario de amortización programa las cuotas semanalmente para coincidir de forma ordenada con tus viáticos universitarios. Además, el sistema te otorga 7 días exactos de gracia inicial desde el desembolso antes de tu primera cuota hábil."
               },
               {
                 q: "¿Para qué sirve declarar el promedio general del semestre anterior?",
@@ -431,14 +431,14 @@ export default function LandingPage() {
               },
               {
                 q: "¿Qué sucede con el garante solidario si un estudiante se atrasa en sus pagos?",
-                a: "Si un estudiante acumula dos semanas o más en mora de sus cuotas de los lunes, el saldo pendiente pasará a reportarse automáticamente en el portal de su compañero garante, para que puedan coordinar responsablemente el pago y mantener la reputación crediticia del grupo."
+                a: "Si un estudiante acumula dos semanas o más en mora de sus cuotas semanales, el saldo pendiente pasará a reportarse automáticamente en el portal de su compañero garante, para que puedan coordinar responsablemente el pago y mantener la reputación crediticia del grupo."
               },
               {
                 q: "¿Puedo cancelar o abonar todas las cuotas antes de tiempo?",
                 a: "¡Sí! Dentro del portal estudiantil puedes liquidar tus cuotas anticipadamente o abonar la totalidad en cualquier momento. Esto generará de inmediato tu recibo bancario digital y renovará el 100% de tu cupo disponible."
               },
               {
-                q: "¿Cómo obtengo mi recibo oficial al realizar el pago de mis lunes?",
+                q: "¿Cómo obtengo mi recibo oficial al realizar el pago de mis cuotas?",
                 a: "Cada vez que registres el pago de una cuota desde tu panel de estudiante, el sistema generará de forma automática en vivo un Comprobante Electrónico Institucional encriptado SSL Módulo 10, con opción de descarga e impresión."
               }
             ].map((faq, idx) => {
