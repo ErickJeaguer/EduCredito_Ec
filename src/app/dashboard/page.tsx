@@ -20,7 +20,8 @@ import { CreditWalletHero } from '../../components/dashboard/CreditWalletHero';
 import {
   GraduationCap, LogOut, AlertTriangle, FileText, Loader2,
   DollarSign, Check, Play, UserCheck, AlertCircle, Receipt,
-  ChevronRight, Shield, TrendingUp, Calendar, ArrowRight, Star
+  ChevronRight, Shield, TrendingUp, Calendar, ArrowRight, Star,
+  CheckCircle2, Sparkles, ShieldCheck
 } from 'lucide-react';
 
 type TabId = 'summary' | 'simulator' | 'loans' | 'guaranteed';
@@ -58,6 +59,12 @@ export default function StudentDashboardPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLoanForDetails, setSelectedLoanForDetails] = useState<string | null>(null);
   const [activeReceipt, setActiveReceipt] = useState<PaymentReceipt | null>(null);
+  const [successModalData, setSuccessModalData] = useState<{
+    amount: number;
+    weeks: number;
+    guarantorName: string;
+    certificateFileName?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -110,8 +117,12 @@ export default function StudentDashboardPage() {
     const result = await createLoanRequest(user, amount, weeks, grade, guarantor, certificateUrl, certificateFileName);
     setIsSubmitting(false);
     if (result.success) {
-      alert(`Solicitud por $${amount} USD ingresada correctamente. Garante verificado: ${guarantor.fullName}.`);
-      setActiveTab('loans');
+      setSuccessModalData({
+        amount,
+        weeks,
+        guarantorName: guarantor.fullName,
+        certificateFileName,
+      });
     } else {
       alert(`No se pudo procesar tu trámite: ${result.error}`);
     }
@@ -805,6 +816,75 @@ export default function StudentDashboardPage() {
       </main>
 
       <ReceiptModal receipt={activeReceipt} onClose={() => setActiveReceipt(null)} />
+
+      {/* Ventanita Modal Animada con Visto de Solicitud Exitosa */}
+      {successModalData && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadein font-sans">
+          <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#0D1627] border-2 border-emerald-500/40 shadow-2xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 transform scale-100 transition-all">
+            
+            {/* Brillo decorativo de fondo */}
+            <div className="absolute -top-12 -left-12 w-40 h-40 rounded-full bg-emerald-500/20 blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-40 h-40 rounded-full bg-teal-500/20 blur-2xl pointer-events-none" />
+
+            {/* Icono animado de Visto (Check) */}
+            <div className="relative z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-emerald-500 via-emerald-600 to-teal-500 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/40 border-4 border-emerald-300/30 animate-bounce">
+              <CheckCircle2 className="w-12 h-12 sm:w-14 sm:h-14 text-white stroke-[2.5]" />
+            </div>
+
+            <div className="relative z-10 space-y-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                <Sparkles className="w-3.5 h-3.5" /> Transmisión Exitosa
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                ¡Solicitud Registrada!
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Tu expediente fue ingresado correctamente y ya está disponible para revisión del Administrador del Fondo UTB.
+              </p>
+            </div>
+
+            {/* Resumen de los datos enviados */}
+            <div className="relative z-10 p-4 rounded-2xl bg-slate-50 dark:bg-[#0A0E1A] border border-slate-200 dark:border-slate-800 text-left space-y-2 text-xs sm:text-sm shadow-inner">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Monto / Plazo:</span>
+                <strong className="text-slate-900 dark:text-white font-extrabold font-mono text-sm">
+                  ${successModalData.amount}.00 USD ({successModalData.weeks} sem.)
+                </strong>
+              </div>
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Garante validado:</span>
+                <strong className="text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
+                  {successModalData.guarantorName}
+                </strong>
+              </div>
+              <div className="flex items-center justify-between pt-0.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Promoción de notas:</span>
+                <strong className="text-slate-800 dark:text-slate-200 font-semibold truncate max-w-[180px] flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  {successModalData.certificateFileName || 'Archivo_notas.pdf'}
+                </strong>
+              </div>
+            </div>
+
+            <p className="relative z-10 text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              Tiempo de respuesta de secretaría: <b>&lt; 24 horas</b>
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSuccessModalData(null);
+                setActiveTab('loans');
+              }}
+              className="relative z-10 w-full h-12 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm sm:text-base tracking-wide shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <span>Entendido, ver mi expediente</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
