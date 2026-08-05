@@ -65,17 +65,18 @@ export function ThemeToggleButton() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 shadow-sm transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 text-xs font-semibold"
+      className="p-2.5 rounded-xl bg-muted hover:bg-border text-muted-foreground border border-border shadow-sm transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 text-sm font-semibold"
       title={theme === 'light' ? 'Cambiar a Modo Oscuro' : 'Cambiar a Modo Claro'}
+      aria-label={theme === 'light' ? 'Cambiar a Modo Oscuro' : 'Cambiar a Modo Claro'}
     >
       {theme === 'light' ? (
         <>
-          <Moon className="w-4 h-4 text-slate-700" />
+          <Moon className="w-4 h-4" />
           <span className="hidden md:inline">Modo Oscuro</span>
         </>
       ) : (
         <>
-          <Sun className="w-4 h-4 text-amber-400" />
+          <Sun className="w-4 h-4 text-accent" />
           <span className="hidden md:inline">Modo Claro</span>
         </>
       )}

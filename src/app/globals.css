@@ -2,54 +2,152 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-}
+/* ==========================================================================
+   EduCrédito UTB — Sistema de diseño
+   Identidad: "Cooperativa académica" — teal institucional + ámbar cálido.
+   ========================================================================== */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #090d16;
-    --foreground: #f8fafc;
-    --card-bg: #0e1422;
-    --border-color: #1e293b;
-  }
+:root {
+  --background: #f7f6f2;
+  --foreground: #17231f;
+  --card: #ffffff;
+  --card-foreground: #17231f;
+  --popover: #ffffff;
+  --popover-foreground: #17231f;
+
+  --primary: #0f6d62;
+  --primary-foreground: #ffffff;
+
+  --accent: #b8791f;
+  --accent-foreground: #ffffff;
+
+  --muted: #eeece5;
+  --muted-foreground: #5f6b66;
+
+  --border: #e3e0d7;
+  --input: #e3e0d7;
+  --ring: #0f6d62;
+
+  --success: #2f855a;
+  --success-foreground: #ffffff;
+  --success-soft: #e4f2ea;
+
+  --warning: #b7791f;
+  --warning-foreground: #ffffff;
+  --warning-soft: #f7edda;
+
+  --danger: #c0392b;
+  --danger-foreground: #ffffff;
+  --danger-soft: #f6e2df;
+
+  --radius: 0.875rem;
 }
 
 .dark {
-  --background: #090d16;
-  --foreground: #f8fafc;
-  --card-bg: #0e1422;
-  --border-color: #1e293b;
+  --background: #0b1512;
+  --foreground: #ecf2ef;
+  --card: #121f1b;
+  --card-foreground: #ecf2ef;
+  --popover: #121f1b;
+  --popover-foreground: #ecf2ef;
+
+  --primary: #2fb3a1;
+  --primary-foreground: #04130f;
+
+  --accent: #e0a951;
+  --accent-foreground: #1a1305;
+
+  --muted: #17251f;
+  --muted-foreground: #93a39b;
+
+  --border: #223029;
+  --input: #223029;
+  --ring: #2fb3a1;
+
+  --success: #48bb78;
+  --success-foreground: #04130f;
+  --success-soft: #12281e;
+
+  --warning: #ecc94b;
+  --warning-foreground: #1a1305;
+  --warning-soft: #2a2410;
+
+  --danger: #f1705b;
+  --danger-foreground: #1a0603;
+  --danger-soft: #2c1512;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Estilos de tabla limpios y profesionales */
+/* Cifras monetarias alineadas */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
 table {
   border-collapse: collapse;
 }
 
 /* Scrollbar discreto */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  border-radius: 4px;
 }
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--muted-foreground) 55%, transparent);
 }
