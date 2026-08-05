@@ -9,8 +9,6 @@ import {
   subscribeToGuaranteedDebts,
   createLoanRequest,
   simulateInstallmentPayment,
-  demoApproveLoan,
-  demoSimulateOverdue,
   type VerifiedGuarantor,
 } from '../../lib/firebase/loans';
 import type { LoanApplication, PaymentReceipt } from '../../types/credit';
@@ -151,17 +149,6 @@ export default function StudentDashboardPage() {
     };
     setActiveReceipt(receipt);
   };
-
-  const handleDemoApprove = async (loanId: string) => {
-    await demoApproveLoan(loanId);
-    alert('Demo: Préstamo aprobado.');
-  };
-
-  const handleDemoOverdue = async (loanId: string) => {
-    await demoSimulateOverdue(loanId);
-    alert('Demo: Préstamo en MORA.');
-  };
-
   /* ── Datos derivados ──────────────────────────── */
   const creditoActivo = myLoans.find((l) => ['active', 'approved', 'overdue'].includes(l.status));
   const saldoPendiente = creditoActivo
@@ -620,44 +607,32 @@ export default function StudentDashboardPage() {
                         </div>
                       </div>
 
-                      {/* Acciones demo */}
+                      {/* Acciones e información de estado */}
                       <div
                         className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl text-xs"
                         style={{ background: 'var(--surface-1)', border: `1px solid var(--border-subtle)` }}
                       >
-                        <span style={{ color: 'var(--ink-3)' }}>Panel de simulación:</span>
+                        <span style={{ color: 'var(--ink-2)', fontWeight: 500 }}>
+                          {loan.status === 'pending'
+                            ? '⏳ En revisión por la Secretaría del Fondo UTB'
+                            : loan.status === 'active' || loan.status === 'approved'
+                            ? '✅ Crédito activo — Paga tus cuotas según el cronograma'
+                            : loan.status === 'overdue'
+                            ? '⚠️ Crédito en mora — Regulariza tus pagos para evitar reportes'
+                            : '🏁 Crédito totalmente liquidado'}
+                        </span>
                         <div className="flex flex-wrap gap-2">
-                          {loan.status === 'pending' && (
-                            <button
-                              type="button"
-                              onClick={() => handleDemoApprove(loan.id!)}
-                              className="h-7 px-3 rounded-lg text-xs font-semibold text-white flex items-center gap-1.5"
-                              style={{ background: 'var(--warning)' }}
-                            >
-                              <Play className="w-3 h-3" /> Aprobar
-                            </button>
-                          )}
-                          {loan.status === 'active' && (
-                            <button
-                              type="button"
-                              onClick={() => handleDemoOverdue(loan.id!)}
-                              className="h-7 px-3 rounded-lg text-xs font-semibold text-white flex items-center gap-1.5"
-                              style={{ background: 'var(--danger)' }}
-                            >
-                              <AlertTriangle className="w-3 h-3" /> Simular mora
-                            </button>
-                          )}
                           <button
                             type="button"
                             onClick={() => setSelectedLoanForDetails(isSelected ? null : loan.id!)}
-                            className="h-7 px-3 rounded-lg text-xs font-semibold transition"
+                            className="h-7 px-3 rounded-lg text-xs font-semibold transition cursor-pointer"
                             style={{
                               background: 'var(--surface-0)',
                               color: 'var(--ink-1)',
                               border: `1px solid var(--border-strong)`,
                             }}
                           >
-                            {isSelected ? 'Ocultar cuotas' : 'Ver cuotas'}
+                            {isSelected ? 'Ocultar cuotas' : 'Ver cronograma de cuotas'}
                           </button>
                         </div>
                       </div>

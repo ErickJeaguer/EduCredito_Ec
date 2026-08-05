@@ -42,23 +42,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
+  const fetchUserProfile = async (uid: string, userEmail?: string | null): Promise<UserProfile | null> => {
     try {
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
+      const isAdminEmail = userEmail === 'admin@utb.edu.ec' || userEmail?.toLowerCase() === 'admin@utb.edu.ec';
+
       if (docSnap.exists()) {
         const data = docSnap.data();
+        let currentRole = (data.role as UserRole) || 'student';
+        
+        // Auto-corrección en Firestore para la cuenta oficial del administrador
+        if (isAdminEmail && currentRole !== 'admin') {
+          currentRole = 'admin';
+          await setDoc(docRef, { role: 'admin', email: userEmail }, { merge: true }).catch(() => {});
+        }
+
         return {
           uid,
-          email: data.email || '',
-          fullName: data.fullName || '',
-          cedula: data.cedula || '',
-          faculty: data.faculty || '',
-          career: data.career || '',
-          semester: data.semester ? Number(data.semester) : 1,
-          phone: data.phone || '',
-          role: (data.role as UserRole) || 'student',
+          email: data.email || userEmail || '',
+          fullName: data.fullName || (isAdminEmail ? 'Secretariat UTB — Admin' : 'Estudiante UTB'),
+          cedula: data.cedula || '0000000000',
+          faculty: data.faculty || 'Universidad Técnica de Babahoyo',
+          career: data.career || 'Control del Fondo',
+          semester: data.semester ? Number(data.semester) : 10,
+          phone: data.phone || '0999999999',
+          role: currentRole,
         };
+      } else if (isAdminEmail) {
+        // Si el admin fue creado en Auth de Firebase pero nunca tuvo documento en Firestore
+        const adminProfile: UserProfile = {
+          uid,
+          email: 'admin@utb.edu.ec',
+          fullName: 'Secretariat UTB — Admin',
+          cedula: '0000000000',
+          faculty: 'Administración Central',
+          career: 'Control y Gestión del Fondo',
+          semester: 10,
+          phone: '0999999999',
+          role: 'admin',
+        };
+        await setDoc(docRef, adminProfile, { merge: true }).catch(() => {});
+        return adminProfile;
       }
     } catch (error) {
       console.error('Error obteniendo perfil de Firestore:', error);
@@ -68,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshProfile = async () => {
     if (authUser) {
-      const userProfile = await fetchUserProfile(authUser.uid);
+      const userProfile = await fetchUserProfile(authUser.uid, authUser.email);
       setProfile(userProfile);
     }
   };
@@ -77,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setAuthUser(user);
       if (user) {
-        const userProfile = await fetchUserProfile(user.uid);
+        const userProfile = await fetchUserProfile(user.uid, user.email);
         setProfile(userProfile);
       } else {
         setProfile(null);
@@ -92,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       const userCred = await signInWithEmailAndPassword(auth, email, password);
-      const userProfile = await fetchUserProfile(userCred.user.uid);
+      const userProfile = await fetchUserProfile(userCred.user.uid, userCred.user.email || email);
       setProfile(userProfile);
       return { success: true, role: userProfile?.role || 'student', email: userCred.user.email };
     } catch (error: any) {
