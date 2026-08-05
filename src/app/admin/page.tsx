@@ -8,6 +8,7 @@ import {
   adminApproveLoan, 
   adminRejectLoan,
   deleteLoanApplication,
+  adminPurgeAllLoans,
   fetchLoanDocument
 } from '../../lib/firebase/loans';
 import type { LoanApplication } from '../../types/credit';
@@ -114,6 +115,22 @@ export default function AdminDashboardPage() {
     setProcessingId(null);
     if (!res.success) {
       alert(`Error al eliminar: ${res.error}`);
+    }
+  };
+
+  const handlePurgeAll = async () => {
+    if (allLoans.length === 0) {
+      alert('La base de datos ya está completamente limpia. No hay créditos que eliminar.');
+      return;
+    }
+    if (!confirm(`⚠️ ¿ESTÁS SEGURO DE ELIMINAR TODOS LOS CRÉDITOS (${allLoans.length} en total) DE LA BASE DE DATOS DE FIREBASE?\n\nEsta acción purgará todas las solicitudes y archivos adjuntos del sistema para que inicies tu demostración oficial desde cero.`)) return;
+    setProcessingId('PURGE_ALL');
+    const res = await adminPurgeAllLoans();
+    setProcessingId(null);
+    if (res.success) {
+      alert(`✅ ¡Sistema completamente limpio! Se borraron ${res.deletedCount} expedientes y sus documentos de la base de datos.`);
+    } else {
+      alert(`Error al purgar los créditos: ${res.error}`);
     }
   };
 
@@ -296,6 +313,29 @@ export default function AdminDashboardPage() {
         {/* Tab: Expedientes */}
         {activeTab === 'expedientes' && (
           <div className="space-y-5 animate-fadein">
+
+            {/* Zona de Limpieza para Demostraciones (Sólo Admin) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-red-500/5 p-4 rounded-2xl border border-red-500/20 mb-2 shadow-sm">
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-red-500 flex items-center gap-1.5">
+                  <Trash2 className="w-4 h-4" />
+                  Zona de Limpieza y Preparación de Demostración
+                </h4>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+                  Borra simultáneamente todos los expedientes y archivos de prueba guardados en Firebase para iniciar tu presentación oficial desde cero.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={processingId === 'PURGE_ALL' || allLoans.length === 0}
+                onClick={handlePurgeAll}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition shrink-0 shadow-md hover:opacity-90 flex items-center gap-2 cursor-pointer disabled:opacity-40"
+                style={{ background: '#DC2626' }}
+              >
+                {processingId === 'PURGE_ALL' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Eliminar TODOS los créditos ({allLoans.length})
+              </button>
+            </div>
 
             {/* Barra de filtros */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

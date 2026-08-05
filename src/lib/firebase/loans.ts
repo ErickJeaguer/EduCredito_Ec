@@ -409,39 +409,7 @@ export async function simulateInstallmentPayment(loanId: string, installmentInde
 }
 
 
-/**
- * Helper especial para demostraciones en vivo: Permite al estudiante o evaluador aprobar un préstamo pendiente o simular mora.
- */
-export async function demoApproveLoan(loanId: string): Promise<{ success: boolean }> {
-  try {
-    const docRef = doc(db, 'loans', loanId);
-    await updateDoc(docRef, {
-      status: 'active',
-      updatedAt: new Date().toISOString(),
-    });
-    return { success: true };
-  } catch (error) {
-    console.error('Error aprobando crédito en modo demo:', error);
-    return { success: false };
-  }
-}
 
-/**
- * Helper de demostración para probar cómo una deuda cae en mora y se le reporta al garante solidario.
- */
-export async function demoSimulateOverdue(loanId: string): Promise<{ success: boolean }> {
-  try {
-    const docRef = doc(db, 'loans', loanId);
-    await updateDoc(docRef, {
-      status: 'overdue',
-      updatedAt: new Date().toISOString(),
-    });
-    return { success: true };
-  } catch (error) {
-    console.error('Error simulando mora demo:', error);
-    return { success: false };
-  }
-}
 
 /**
  * ADMINISTRADOR: Escucha en tiempo real (Live Snapshot) TODOS los préstamos del fondo universitario.
@@ -520,6 +488,31 @@ export async function deleteLoanApplication(loanId: string): Promise<{ success: 
   } catch (error: any) {
     console.error('Error eliminando expediente en Firebase:', error);
     return { success: false, error: error?.message || 'No se pudo eliminar de la base de datos. Verifica las reglas de Firebase.' };
+  }
+}
+
+/**
+ * ADMINISTRADOR: Purgar y eliminar TODOS los préstamos y documentos fragmentados de la base de datos de Firebase.
+ * Esta función resetea el sistema de créditos a cero, dejándolo limpio para demostraciones o inicio oficial.
+ */
+export async function adminPurgeAllLoans(): Promise<{ success: boolean; deletedCount?: number; error?: string }> {
+  try {
+    const loansRef = collection(db, 'loans');
+    const snap = await getDocs(loansRef);
+    let count = 0;
+    for (const docSnap of snap.docs) {
+      const loanId = docSnap.id;
+      await deleteDoc(doc(db, 'loans', loanId));
+      count++;
+      // Limpiar también en segundo plano los posibles bloques del documento
+      for (let i = 0; i < 15; i++) {
+        await deleteDoc(doc(db, 'loan_documents', `${loanId}_${i}`)).catch(() => {});
+      }
+    }
+    return { success: true, deletedCount: count };
+  } catch (error: any) {
+    console.error('Error purgar todos los créditos:', error);
+    return { success: false, error: error?.message || 'Error de permisos al purgar Firebase.' };
   }
 }
 
