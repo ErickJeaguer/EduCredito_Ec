@@ -9,6 +9,7 @@ import {
   subscribeToGuaranteedDebts,
   createLoanRequest,
   simulateInstallmentPayment,
+  deleteLoanApplication,
   type VerifiedGuarantor,
 } from '../../lib/firebase/loans';
 import type { LoanApplication, PaymentReceipt } from '../../types/credit';
@@ -621,7 +622,24 @@ export default function StudentDashboardPage() {
                             ? '⚠️ Crédito en mora — Regulariza tus pagos para evitar reportes'
                             : '🏁 Crédito totalmente liquidado'}
                         </span>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (confirm('¿Deseas eliminar y anular este crédito de prueba de tu historial? Esto limpiará el registro de Firebase para demostraciones.')) {
+                                await deleteLoanApplication(loan.id!);
+                              }
+                            }}
+                            className="h-7 px-2.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1 hover:bg-red-500/10"
+                            style={{
+                              background: 'transparent',
+                              color: '#EF4444',
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                            }}
+                            title="Anular y limpiar de la base de datos (Pruebas / Demo)"
+                          >
+                            🗑️ Anular prueba
+                          </button>
                           <button
                             type="button"
                             onClick={() => setSelectedLoanForDetails(isSelected ? null : loan.id!)}

@@ -7,13 +7,14 @@ import {
   subscribeToAllLoans, 
   adminApproveLoan, 
   adminRejectLoan,
+  deleteLoanApplication,
   fetchLoanDocument
 } from '../../lib/firebase/loans';
 import type { LoanApplication } from '../../types/credit';
 import { ThemeToggleButton } from '../../components/theme/ThemeProvider';
 import { 
   ShieldCheck, Users, DollarSign, BarChart3, LogOut, Loader2, 
-  CheckCircle2, XCircle, AlertCircle, Clock, FileText, Filter, MessageSquare
+  CheckCircle2, XCircle, AlertCircle, Clock, FileText, Filter, MessageSquare, Trash2
 } from 'lucide-react';
 import { AnalyticsBI } from '../../components/admin/AnalyticsBI';
 import { UserListTab } from '../../components/admin/UserListTab';
@@ -103,6 +104,17 @@ export default function AdminDashboardPage() {
     setProcessingId(null);
     if (res.success) alert(`Crédito de ${loan.studentName} aprobado.`);
     else alert(`Error: ${res.error}`);
+  };
+
+  const handleDelete = async (loan: LoanApplication) => {
+    if (!loan.id) return;
+    if (!confirm(`¿ESTÁS SEGURO DE ELIMINAR EL EXPEDIENTE DE PRUEBA de ${loan.studentName} ($${loan.requestedAmount}.00 USD)? Esta acción limpiará la base de datos de inmediato.`)) return;
+    setProcessingId(loan.id);
+    const res = await deleteLoanApplication(loan.id);
+    setProcessingId(null);
+    if (!res.success) {
+      alert(`Error al eliminar: ${res.error}`);
+    }
   };
 
   const openRejectionModal = (loan: LoanApplication) => {
@@ -460,37 +472,52 @@ export default function AdminDashboardPage() {
                           </div>
                         )}
 
-                        {loan.status === 'pending' && (
-                          <div
-                            className="pt-3 border-t flex flex-wrap items-center justify-end gap-3"
-                            style={{ borderColor: 'var(--border-subtle)' }}
+                        {/* Barra de acciones (disponible en todos los estados para limpieza de demos y gestión) */}
+                        <div
+                          className="pt-3 border-t flex flex-wrap items-center justify-between gap-3"
+                          style={{ borderColor: 'var(--border-subtle)' }}
+                        >
+                          <button
+                            type="button"
+                            disabled={isProcessing}
+                            onClick={() => handleDelete(loan)}
+                            className="btn-ghost flex items-center gap-1.5 transition-colors duration-150 hover:bg-red-500/10"
+                            style={{ height: '36px', padding: '0 12px', fontSize: '12px', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+                            title="Eliminar este registro de Firebase (Limpieza de pruebas)"
                           >
-                            <button
-                              type="button"
-                              disabled={isProcessing}
-                              onClick={() => openRejectionModal(loan)}
-                              className="btn-ghost"
-                              style={{ height: '38px', padding: '0 16px', fontSize: '13px', color: 'var(--danger)', borderColor: 'color-mix(in srgb, var(--danger) 30%, transparent)' }}
-                            >
-                              <XCircle className="w-4 h-4" />
-                              Rechazar y notificar
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isProcessing}
-                              onClick={() => handleApprove(loan)}
-                              className="btn-primary"
-                              style={{ height: '38px', padding: '0 20px', fontSize: '13px' }}
-                            >
-                              {isProcessing ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <CheckCircle2 className="w-4 h-4" />
-                              )}
-                              Aprobar y desembolsar
-                            </button>
-                          </div>
-                        )}
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Eliminar / Limpiar prueba
+                          </button>
+
+                          {loan.status === 'pending' && (
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <button
+                                type="button"
+                                disabled={isProcessing}
+                                onClick={() => openRejectionModal(loan)}
+                                className="btn-ghost"
+                                style={{ height: '38px', padding: '0 16px', fontSize: '13px', color: 'var(--danger)', borderColor: 'color-mix(in srgb, var(--danger) 30%, transparent)' }}
+                              >
+                                <XCircle className="w-4 h-4" />
+                                Rechazar y notificar
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isProcessing}
+                                onClick={() => handleApprove(loan)}
+                                className="btn-primary"
+                                style={{ height: '38px', padding: '0 20px', fontSize: '13px' }}
+                              >
+                                {isProcessing ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <CheckCircle2 className="w-4 h-4" />
+                                )}
+                                Aprobar y desembolsar
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

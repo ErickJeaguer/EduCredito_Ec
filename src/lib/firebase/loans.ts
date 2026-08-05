@@ -1,6 +1,6 @@
 'use client';
 
-import { collection, doc, addDoc, updateDoc, setDoc, getDoc, query, where, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, doc, addDoc, updateDoc, setDoc, getDoc, deleteDoc, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import { db } from './client';
 import type { LoanApplication, LoanStatus, PaymentReceipt } from '../../types/credit';
 import { generateAmortizationSchedule } from '../financial/amortization';
@@ -499,6 +499,27 @@ export async function adminRejectLoan(loanId: string, rejectionReason: string): 
   } catch (error) {
     console.error('Error administrativo al rechazar crédito:', error);
     return { success: false, error: 'No se pudo registrar el rechazo en el servidor.' };
+  }
+}
+
+/**
+ * ELIMINACIÓN DE EXPEDIENTES (LIMPIEZA DE PRUEBAS / DEMOS):
+ * Borra por completo el documento de solicitud en 'loans' y cualquier archivo fragmentado asociado en 'loan_documents'.
+ */
+export async function deleteLoanApplication(loanId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const docRef = doc(db, 'loans', loanId);
+    await deleteDoc(docRef);
+    
+    // Limpiar también en segundo plano los posibles bloques del documento PDF o imagen adjunta
+    for (let i = 0; i < 15; i++) {
+      await deleteDoc(doc(db, 'loan_documents', `${loanId}_${i}`)).catch(() => {});
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error eliminando expediente en Firebase:', error);
+    return { success: false, error: error?.message || 'No se pudo eliminar de la base de datos. Verifica las reglas de Firebase.' };
   }
 }
 
