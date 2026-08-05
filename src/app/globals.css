@@ -2,54 +2,502 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ──────────────────────────────────────────────
+   @theme — Extensión del sistema de diseño Tailwind v4
+   Palette: Fintech Slate + Verde UTB Institucional
+   ────────────────────────────────────────────── */
+@theme {
+  /* Familia tipográfica */
+  --font-family-sans: 'Geist', 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-family-mono: 'Geist Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Paleta de colores — Extensión slate */
+  --color-slate-850: #111827;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  /* Fintech Brand — Azul eléctrico (para acentos secundarios) */
+  --color-fintech-50:  #eff6ff;
+  --color-fintech-100: #dbeafe;
+  --color-fintech-500: #2563eb;
+  --color-fintech-600: #1d4ed8;
+  --color-fintech-700: #1e40af;
+
+  /* Sombras personalizadas */
+  --shadow-fintech-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --shadow-fintech-glow: 0 10px 25px -5px rgba(0, 107, 78, 0.14), 0 8px 10px -6px rgba(0, 107, 78, 0.08);
+  --shadow-fintech-glow-blue: 0 10px 25px -5px rgba(37, 99, 235, 0.12), 0 8px 10px -6px rgba(37, 99, 235, 0.08);
+
+  /* Border radius extendido */
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+}
+
+/* ──────────────────────────────────────────────
+   DESIGN TOKENS — EduCrédito UTB
+   Sistema cromático bancario con identidad verde institucional
+   ────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
+  /* Verde institucional UTB Vibrante (Heredado del sistema original) */
+  --brand:          #0F8B6D;
+  --brand-hover:    #0B6D55;
+  --brand-light:    #22A06B;
+  --brand-muted:    #D1FAE5;
+  --brand-ring:     rgba(15, 139, 109, 0.25);
+
+  /* Superficies (Luz) */
+  --surface-page:   #F7F8FA;
+  --surface-0:      #FFFFFF;
+  --surface-1:      #F4F6F9;
+  --surface-2:      #ECEEF2;
+
+  /* Texto (Luz) */
+  --ink-1:          #0D1117;
+  --ink-2:          #4A5568;
+  --ink-3:          #8D99A8;
+  --ink-inv:        #FFFFFF;
+
+  /* Bordes (Luz) */
+  --border-subtle:  #E4E8EE;
+  --border-strong:  #CBD5E0;
+
+  /* Sombras */
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:      0 12px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.05);
+  --shadow-xl:      0 20px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
+
+  /* Semánticos */
+  --success:        #047857;
+  --success-bg:     #ECFDF5;
+  --warning:        #B45309;
+  --warning-bg:     #FFFBEB;
+  --danger:         #BE123C;
+  --danger-bg:      #FFF1F2;
+  --info:           #1D4ED8;
+  --info-bg:        #EFF6FF;
+
+  /* Fintech accent (azul) */
+  --accent:         #2563EB;
+  --accent-hover:   #1D4ED8;
+  --accent-ring:    rgba(37, 99, 235, 0.2);
+  --accent-muted:   #EFF6FF;
+
+  /* Transiciones */
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:    cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #090d16;
-    --foreground: #f8fafc;
-    --card-bg: #0e1422;
-    --border-color: #1e293b;
-  }
-}
-
+/* Modo oscuro */
 .dark {
-  --background: #090d16;
-  --foreground: #f8fafc;
-  --card-bg: #0e1422;
-  --border-color: #1e293b;
+  --brand:          #10B981;
+  --brand-hover:    #059669;
+  --brand-light:    #34D399;
+  --brand-muted:    rgba(16, 185, 129, 0.12);
+  --brand-ring:     rgba(16, 185, 129, 0.25);
+
+  --surface-page:   #070B13;
+  --surface-0:      #0D1421;
+  --surface-1:      #131D2E;
+  --surface-2:      #1A2540;
+
+  --ink-1:          #EDF2FA;
+  --ink-2:          #8492AD;
+  --ink-3:          #4F5E78;
+  --ink-inv:        #070B13;
+
+  --border-subtle:  #1A2540;
+  --border-strong:  #263350;
+
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.25);
+  --shadow-lg:      0 12px 32px rgba(0,0,0,0.55), 0 4px 8px rgba(0,0,0,0.3);
+  --shadow-xl:      0 20px 48px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.35);
+
+  --success:        #10B981;
+  --success-bg:     rgba(16, 185, 129, 0.08);
+  --warning:        #F59E0B;
+  --warning-bg:     rgba(245, 158, 11, 0.08);
+  --danger:         #F43F5E;
+  --danger-bg:      rgba(244, 63, 94, 0.08);
+  --info:           #60A5FA;
+  --info-bg:        rgba(96, 165, 250, 0.08);
+
+  --accent:         #3B82F6;
+  --accent-hover:   #2563EB;
+  --accent-ring:    rgba(59, 130, 246, 0.18);
+  --accent-muted:   rgba(59, 130, 246, 0.08);
+}
+
+/* ──────────────────────────────────────────────
+   BASE RESET Y FUNDAMENTOS
+   ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "cv11" 1;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--surface-page);
+  color: var(--ink-1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-/* Estilos de tabla limpios y profesionales */
-table {
-  border-collapse: collapse;
+::selection {
+  background-color: var(--brand-muted);
+  color: var(--brand);
 }
 
-/* Scrollbar discreto */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+/* ──────────────────────────────────────────────
+   SCROLLBAR DISCRETO
+   ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: var(--border-strong);
+  border-radius: 4px;
 }
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+
+/* ──────────────────────────────────────────────
+   COMPONENTES REUTILIZABLES (Atomic)
+   ────────────────────────────────────────────── */
+
+/* Card variants */
+.card {
+  background: var(--surface-0);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all 250ms var(--ease-smooth);
+}
+.card:hover { 
+  box-shadow: var(--shadow-md); 
+  border-color: color-mix(in srgb, var(--brand) 30%, var(--border-subtle));
+}
+
+/* Tarjeta interactiva con elevación (estilo original Vainilla JS) */
+.card-hover {
+  transition: transform 300ms var(--ease-spring), box-shadow 300ms ease, border-color 200ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px -10px var(--brand-ring), var(--shadow-lg) !important;
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent) !important;
+}
+
+/* Tarjeta Glassmorphic */
+.card-glass {
+  background: color-mix(in srgb, var(--surface-0) 82%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, var(--ink-1) 10%, transparent);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+}
+.dark .card-glass {
+  background: rgba(13, 20, 33, 0.75);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Texto degradado brillante */
+.text-gradient-brand {
+  background: linear-gradient(135deg, var(--brand) 0%, #2563EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dark .text-gradient-brand {
+  background: linear-gradient(135deg, #34D399 0%, #60A5FA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card-elevated {
+  background: var(--surface-0);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.card-dark {
+  background: var(--ink-1);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  color: var(--ink-inv);
+}
+
+/* Input base bancario */
+.input-bank {
+  height: 44px;
+  width: 100%;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface-0);
+  color: var(--ink-1);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 150ms, box-shadow 150ms, background 150ms;
+  outline: none;
+}
+.input-bank::placeholder { color: var(--ink-3); font-weight: 400; }
+.input-bank:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+  background: var(--surface-0);
+}
+.input-bank:hover:not(:focus) { border-color: var(--ink-3); }
+.input-bank:-webkit-autofill,
+.input-bank:-webkit-autofill:hover, 
+.input-bank:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-0) inset !important;
+  -webkit-text-fill-color: var(--ink-1) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Botón primario — Verde UTB */
+/* Botón primario — Verde UTB Vibrante con Gradiente y Elevación */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand) 0%, #059669 100%);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 200ms var(--ease-spring);
+  box-shadow: 0 4px 14px var(--brand-ring);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -4px var(--brand), 0 4px 12px var(--brand-ring);
+  filter: brightness(1.06);
+}
+.btn-primary:active { transform: translateY(0px) scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; }
+
+/* Botón secundario — Slate */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: var(--ink-1);
+  color: var(--ink-inv);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 180ms var(--ease-spring);
+}
+.btn-secondary:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.btn-secondary:active { transform: scale(0.98); }
+
+/* Botón outline */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1.5px solid var(--border-strong);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.btn-ghost:hover { background: var(--surface-1); color: var(--brand); border-color: var(--brand); }
+
+/* Botón acento azul fintech */
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 200ms var(--ease-spring);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+.btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -4px rgba(37, 99, 235, 0.5); filter: brightness(1.08); }
+.btn-accent:active { transform: translateY(0px) scale(0.98); }
+
+/* Badge / Etiqueta de estado */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.badge-success { background: var(--success-bg); color: var(--success); border: 1px solid color-mix(in srgb, var(--success) 20%, transparent); }
+.badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 20%, transparent); }
+.badge-danger  { background: var(--danger-bg);  color: var(--danger);  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent); }
+.badge-info    { background: var(--info-bg);     color: var(--info);    border: 1px solid color-mix(in srgb, var(--info) 20%, transparent); }
+.badge-neutral { background: var(--surface-2);   color: var(--ink-2);   border: 1px solid var(--border-subtle); }
+.badge-brand   { background: var(--brand-muted); color: var(--brand);   border: 1px solid color-mix(in srgb, var(--brand) 20%, transparent); }
+
+/* Número financiero grande */
+.finance-number {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink-1);
+  font-family: var(--font-family-mono, monospace);
+}
+
+/* Progress bar */
+.progress-track {
+  height: 6px;
+  width: 100%;
+  background: var(--surface-2);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--brand) 0%, #00C48C 100%);
+  transition: width 600ms var(--ease-smooth);
+}
+
+/* Animaciones */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-14px) rotate(3deg); }
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(1.08); }
+}
+@keyframes checkPop {
+  0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes pulse-brand {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.97); }
+}
+
+.animate-fadein { animation: fadeSlideIn 400ms var(--ease-smooth) both; }
+.animate-fadein-pure { animation: fadeIn 250ms ease both; }
+.animate-float { animation: floatSlow 5s ease-in-out infinite; }
+.animate-glow { animation: pulseGlow 4s ease-in-out infinite; }
+.animate-check-pop { animation: checkPop 450ms var(--ease-spring) both; }
+.animate-pulse-brand { animation: pulse-brand 2s ease-in-out infinite; }
+
+/* Esferas luminosas de fondo para dar vida (Glow Orbs) */
+.glow-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+.glow-orb-brand { background: var(--brand); opacity: 0.18; }
+.glow-orb-blue { background: #2563EB; opacity: 0.15; }
+.dark .glow-orb-brand { opacity: 0.25; filter: blur(90px); }
+.dark .glow-orb-blue { opacity: 0.22; filter: blur(90px); }
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
+
+/* Divider troquelado (estilo recibo bancario) */
+.divider-dashed {
+  border: none;
+  border-top: 2px dashed var(--border-subtle);
+}
+
+/* Línea troquelada especial para recibos */
+.receipt-cut {
+  position: relative;
+  border: none;
+  border-top: 1.5px dashed var(--border-strong);
+  margin: 0 -8px;
+}
+.receipt-cut::before,
+.receipt-cut::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  width: 18px;
+  height: 18px;
+  background: var(--surface-page);
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+}
+.receipt-cut::before { left: -9px; }
+.receipt-cut::after  { right: -9px; }
+
+/* Trust badge (sello de seguridad) */
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+}
+
+/* Score ring (para medidor crediticio) */
+@property --score-progress {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
 }

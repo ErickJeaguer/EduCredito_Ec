@@ -27,6 +27,8 @@ export interface LoanApplication {
   
   // Requisitos Académicos y Garante Solidario UTB
   previousSemesterGrade: number; // Promedio de notas del semestre anterior
+  certificateDocumentUrl?: string; // Documento o certificado de promoción de notas (Base64 / URL)
+  certificateFileName?: string;    // Nombre del archivo subido (Ej. certificado_notas.pdf)
   guarantorUid: string;          // UID del compañero garante verificado en Nube
   guarantorName: string;         // Nombre y apellido oficial del garante
   guarantorCedula: string;       // Cédula o correo del garante

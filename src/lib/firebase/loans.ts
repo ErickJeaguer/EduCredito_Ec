@@ -1,6 +1,6 @@
 'use client';
 
-import { collection, doc, addDoc, updateDoc, getDoc, query, where, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, doc, addDoc, updateDoc, setDoc, getDoc, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 import { db } from './client';
 import type { LoanApplication, LoanStatus, PaymentReceipt } from '../../types/credit';
 import { generateAmortizationSchedule } from '../financial/amortization';
@@ -26,67 +26,110 @@ export async function verifyGuarantorEligibility(
   applicantSemester: number,
   guarantorIdentifier: string
 ): Promise<{ valid: boolean; error?: string; guarantor?: VerifiedGuarantor }> {
+  const trimmed = guarantorIdentifier.trim();
+  if (!trimmed) {
+    return { valid: false, error: 'Por favor ingresa la Cédula o el Correo Institucional de tu compañero garante.' };
+  }
+
   try {
-    const trimmed = guarantorIdentifier.trim();
-    if (!trimmed) {
-      return { valid: false, error: 'Por favor ingresa la Cédula o el Correo Institucional de tu compañero garante.' };
-    }
-
     const usersRef = collection(db, 'users');
-    // Consultamos si coincide con cédula o correo
-    const qCedula = query(usersRef, where('cedula', '==', trimmed));
-    const snapCedula = await getDocs(qCedula);
-
+    let guarantorDocId: string | null = null;
     let docData: UserProfile | null = null;
 
-    if (!snapCedula.empty) {
-      docData = snapCedula.docs[0].data() as UserProfile;
-    } else {
-      // Intentar por correo institucional
-      const qEmail = query(usersRef, where('email', '==', trimmed.toLowerCase()));
-      const snapEmail = await getDocs(qEmail);
-      if (!snapEmail.empty) {
-        docData = snapEmail.docs[0].data() as UserProfile;
+    // --- Búsqueda por cédula ---
+    try {
+      const qCedula = query(usersRef, where('cedula', '==', trimmed));
+      const snapCedula = await getDocs(qCedula);
+      if (!snapCedula.empty) {
+        guarantorDocId = snapCedula.docs[0].id; // El docId ES el UID en esta app
+        docData = snapCedula.docs[0].data() as UserProfile;
+      }
+    } catch (innerErr: any) {
+      // Si hay error de índice o permisos en la query por cédula, loguear pero continuar con búsqueda por email
+      console.warn('[verifyGuarantor] Error en búsqueda por cédula:', innerErr?.code, innerErr?.message);
+    }
+
+    // --- Búsqueda por correo (fallback) ---
+    if (!docData) {
+      try {
+        const qEmail = query(usersRef, where('email', '==', trimmed.toLowerCase()));
+        const snapEmail = await getDocs(qEmail);
+        if (!snapEmail.empty) {
+          guarantorDocId = snapEmail.docs[0].id;
+          docData = snapEmail.docs[0].data() as UserProfile;
+        }
+      } catch (innerErr: any) {
+        console.warn('[verifyGuarantor] Error en búsqueda por correo:', innerErr?.code, innerErr?.message);
+        throw innerErr; // Re-lanzar para capturarlo en el catch externo con mensaje específico
       }
     }
 
-    if (!docData) {
-      return { 
-        valid: false, 
-        error: 'No encontramos a ningún estudiante universitario registrado con esa cédula o correo. Pídele a tu compañero que se registre primero en EduCrédito UTB.' 
+    if (!docData || !guarantorDocId) {
+      return {
+        valid: false,
+        error: 'No encontramos ningún estudiante registrado con esa cédula o correo. Pídele a tu compañero que se registre primero en EduCrédito UTB.',
       };
     }
 
-    if (docData.uid === applicantUid) {
-      return { 
-        valid: false, 
-        error: 'Por normas de ética financiera universitaria, no puedes ser tu propio garante solidario.' 
+    // Usar el ID del documento como UID canónico (evita inconsistencias si el campo uid está desincronizado)
+    const guarantorUid = guarantorDocId;
+
+    if (guarantorUid === applicantUid) {
+      return {
+        valid: false,
+        error: 'Por normas de ética financiera universitaria, no puedes ser tu propio garante solidario.',
       };
     }
 
     // Validación especial de 1er semestre
     const guarantorSemester = Number(docData.semester || 1);
+    const firstName = (docData.fullName || 'tu compañero').split(' ')[0];
     if (Number(applicantSemester) === 1 && guarantorSemester < 2) {
-      return { 
-        valid: false, 
-        error: `Como estudiante de 1er Semestre, el reglamento exige que tu garante curse el 2do Semestre o superior (tu compañero ${docData.fullName.split(' ')[0]} cursa actualmente el ${guarantorSemester}º Semestre).` 
+      return {
+        valid: false,
+        error: `Como estudiante de 1er Semestre, el reglamento exige que tu garante curse el 2do Semestre o superior (${firstName} cursa actualmente el ${guarantorSemester}º Semestre).`,
       };
     }
 
     const guarantor: VerifiedGuarantor = {
-      uid: docData.uid,
-      fullName: docData.fullName,
-      cedula: docData.cedula,
-      email: docData.email,
+      uid: guarantorUid,
+      fullName: docData.fullName || 'Estudiante UTB',
+      cedula: docData.cedula || '',
+      email: docData.email || '',
       semester: guarantorSemester,
       faculty: docData.faculty || 'UTB',
       career: docData.career || 'Estudiante',
     };
 
     return { valid: true, guarantor };
-  } catch (error) {
-    console.error('Error al verificar garante en Nube:', error);
-    return { valid: false, error: 'Error al consultar la base de datos de estudiantes UTB. Revisa tu conexión.' };
+
+  } catch (error: any) {
+    console.error('[verifyGuarantor] Error inesperado:', error);
+
+    // Mensajes específicos por código de error de Firestore
+    if (error?.code === 'permission-denied') {
+      return {
+        valid: false,
+        error: 'Sin permisos para consultar el registro de estudiantes. Contacta al administrador de la UTB.',
+      };
+    }
+    if (error?.code === 'unavailable' || error?.code === 'deadline-exceeded') {
+      return {
+        valid: false,
+        error: 'No se pudo contactar con el servidor de la UTB. Verifica tu conexión a internet e inténtalo de nuevo.',
+      };
+    }
+    if (error?.code === 'failed-precondition') {
+      return {
+        valid: false,
+        error: 'La base de datos requiere configuración de índices. Contacta al administrador técnico de la plataforma.',
+      };
+    }
+
+    return {
+      valid: false,
+      error: 'Ocurrió un error inesperado al consultar el registro de estudiantes. Intenta de nuevo en unos segundos.',
+    };
   }
 }
 
@@ -120,14 +163,71 @@ export async function checkActiveLoanRestriction(userId: string): Promise<{ allo
 }
 
 /**
- * Crea y envía una nueva solicitud oficial de microcrédito a la nube de Firebase, incorporando al garante verificado y promedio académico.
+ * Almacena archivos grandes en Firestore en bloques de 700 KB (para sortear el límite de 1MB por documento de Firestore)
+ * o de forma directa si son livianos.
+ */
+async function saveDocumentToFirestore(loanId: string, dataUrl: string): Promise<string> {
+  const CHUNK_SIZE = 700000; // 700 KB por fragmento
+  if (dataUrl.length <= CHUNK_SIZE) {
+    return dataUrl;
+  }
+
+  try {
+    const chunkCount = Math.ceil(dataUrl.length / CHUNK_SIZE);
+    for (let i = 0; i < chunkCount; i++) {
+      const slice = dataUrl.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+      await setDoc(doc(db, 'loan_documents', `${loanId}_${i}`), {
+        slice,
+        chunkIndex: i,
+        totalChunks: chunkCount,
+        loanId,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+    return `firestore_chunked:${loanId}`;
+  } catch (err) {
+    console.error('Error al fragmentar documento en Firestore:', err);
+    return dataUrl.slice(0, 800000); // Fallback parcial en caso de error extremo
+  }
+}
+
+/**
+ * Recupera y reconstruye archivos (sea que estén en Data URL directo o fragmentados en Firestore).
+ */
+export async function fetchLoanDocument(urlOrRef?: string): Promise<string> {
+  if (!urlOrRef) return '';
+  if (!urlOrRef.startsWith('firestore_chunked:')) {
+    return urlOrRef;
+  }
+
+  const loanId = urlOrRef.split(':')[1];
+  try {
+    let completeDataUrl = '';
+    for (let i = 0; i < 15; i++) {
+      const docSnap = await getDoc(doc(db, 'loan_documents', `${loanId}_${i}`));
+      if (!docSnap.exists()) break;
+      const data = docSnap.data();
+      completeDataUrl += data.slice || '';
+      if (i + 1 >= (data.totalChunks || 1)) break;
+    }
+    return completeDataUrl;
+  } catch (error) {
+    console.error('Error reconstruyendo documento desde Firestore:', error);
+    return '';
+  }
+}
+
+/**
+ * Crea y envía una nueva solicitud oficial de microcrédito a la nube de Firebase, incorporando al garante verificado y certificado adjunto.
  */
 export async function createLoanRequest(
   user: UserProfile,
   amount: number,
   weeks: number,
   grade: number,
-  guarantor: VerifiedGuarantor
+  guarantor: VerifiedGuarantor,
+  certificateUrl?: string,
+  certificateFileName?: string
 ): Promise<{ success: boolean; error?: string; loanId?: string }> {
   // 1. Verificación en tiempo real de reglas anti-sobreendeudamiento
   const restriction = await checkActiveLoanRestriction(user.uid);
@@ -146,7 +246,8 @@ export async function createLoanRequest(
     career: user.career || 'Estudiante',
     semester: user.semester || 1,
     
-    previousSemesterGrade: Number(grade),
+    previousSemesterGrade: Number(grade || 0),
+    ...(certificateFileName ? { certificateFileName: certificateFileName } : {}),
     guarantorUid: guarantor.uid,
     guarantorName: guarantor.fullName,
     guarantorCedula: guarantor.cedula || guarantor.email,
@@ -175,6 +276,13 @@ export async function createLoanRequest(
   try {
     const loansRef = collection(db, 'loans');
     const docRef = await addDoc(loansRef, newLoan);
+
+    // Si hay un archivo adjunto (hasta 2.5 MB), lo persistimos y conectamos al expediente
+    if (certificateUrl) {
+      const finalDocUrl = await saveDocumentToFirestore(docRef.id, certificateUrl);
+      await updateDoc(docRef, { certificateDocumentUrl: finalDocUrl });
+    }
+
     return { success: true, loanId: docRef.id };
   } catch (error) {
     console.error('Error persistiendo solicitud en Firestore:', error);
@@ -218,12 +326,20 @@ export function subscribeToGuaranteedDebts(userId: string, callback: (debts: Loa
       ...(docSnap.data() as Omit<LoanApplication, 'id'>),
     }));
     
-    // Filtros de deuda solidaria: mostrar si el crédito está en mora ('overdue') o si acumula cuotas impagadas
+    // Filtros de deuda solidaria: mostrar si el crédito está en mora ('overdue') o si acumula cuotas VENCIDAS
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Comparar solo fecha, sin hora
     const debts = allGuaranteed.filter((loan) => {
       if (loan.status === 'overdue') return true;
-      // Verificar si hay 2 o más cuotas pendientes vencidas para activar alerta en el garante
-      const unpaidCount = loan.installments.filter((inst) => !inst.isPaid).length;
-      return loan.status === 'active' && unpaidCount >= 2;
+      // Bug 3 fix: Contar cuotas vencidas (dueDate < hoy Y sin pagar), NO el total de impagas.
+      // Un crédito recién activado tiene cuotas futuras sin pagar, no en mora.
+      const overdueCount = (loan.installments || []).filter((inst) => {
+        if (inst.isPaid) return false;
+        const dueDate = new Date(inst.dueDate);
+        dueDate.setHours(0, 0, 0, 0);
+        return dueDate < today;
+      }).length;
+      return loan.status === 'active' && overdueCount >= 2;
     });
 
     callback(debts);

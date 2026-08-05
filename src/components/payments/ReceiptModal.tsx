@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { PaymentReceipt } from '../../types/credit';
-import { GraduationCap, CheckCircle2, ShieldCheck, Printer, X, Download, Landmark, Sparkles, Calendar, User, FileText } from 'lucide-react';
+import {
+  GraduationCap, CheckCircle2, ShieldCheck, Printer, X,
+  Download, Calendar, User, Hash, Sparkles, CreditCard
+} from 'lucide-react';
 
 interface ReceiptModalProps {
   receipt: PaymentReceipt | null;
@@ -10,149 +13,280 @@ interface ReceiptModalProps {
 }
 
 export const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
-  if (!receipt) return null;
+  // Cerrar con Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  if (!receipt) return null;
 
   const formattedDate = new Date(receipt.paidAt).toLocaleString('es-EC', {
     dateStyle: 'long',
-    timeStyle: 'medium'
+    timeStyle: 'short',
   });
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#0E1422] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 overflow-hidden transform transition-all">
-        
-        {/* Franja superior verde institucional */}
-        <div className="h-2 bg-emerald-600 dark:bg-emerald-500 w-full" />
+  const transactionId = receipt.referenceNumber.replace(/\D/g, '').slice(0, 12).padStart(12, '0');
+  const isFullyPaid = receipt.remainingLoanBalance === 0;
 
-        {/* Encabezado Institucional */}
-        <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800/80 flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-700 text-white rounded-xl shadow-xs">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                <Landmark className="w-3.5 h-3.5" /> Universidad Técnica de Babahoyo
-              </div>
-              <h3 className="text-lg font-bold tracking-tight mt-0.5 text-slate-900 dark:text-white">
-                Comprobante de Caja Solidaria
-              </h3>
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(7, 11, 19, 0.65)', backdropFilter: 'blur(6px)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="relative w-full max-w-md animate-fadein"
+        style={{
+          background: 'var(--surface-0)',
+          borderRadius: '20px',
+          boxShadow: 'var(--shadow-xl)',
+          overflow: 'hidden',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        {/* Franja superior degradado institucional */}
+        <div
+          style={{
+            height: '4px',
+            background: 'linear-gradient(90deg, var(--brand) 0%, #00C48C 50%, var(--accent) 100%)',
+          }}
+        />
+
+        {/* Botón cerrar */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+          style={{ color: 'var(--ink-3)', background: 'var(--surface-1)' }}
+          aria-label="Cerrar"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        {/* Hero — Estado del pago */}
+        <div
+          className="px-6 pt-6 pb-5 text-center"
+          style={{ borderBottom: `1px solid var(--border-subtle)` }}
+        >
+          {/* Ícono animado */}
+          <div className="flex justify-center mb-3">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center animate-check-pop"
+              style={{ background: 'var(--success-bg)', border: `2px solid color-mix(in srgb, var(--success) 30%, transparent)` }}
+            >
+              <CheckCircle2 className="w-8 h-8" style={{ color: 'var(--success)' }} />
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            aria-label="Cerrar recibo"
+
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-1"
+            style={{ color: 'var(--brand)' }}
           >
-            <X className="w-5 h-5" />
-          </button>
+            Pago Verificado
+          </p>
+          <p
+            className="text-[11px] font-medium"
+            style={{ color: 'var(--ink-3)' }}
+          >
+            Cuota #{receipt.weekNumber} · Amortización semanal
+          </p>
+
+          {/* Monto principal */}
+          <div className="mt-4">
+            <p
+              className="text-[42px] font-extrabold tracking-tight tabular-nums leading-none"
+              style={{ color: 'var(--ink-1)', fontFamily: 'var(--font-family-mono, monospace)' }}
+            >
+              ${receipt.amount.toFixed(2)}
+            </p>
+            <p className="text-sm mt-1" style={{ color: 'var(--ink-3)' }}>USD</p>
+          </div>
+
+          {/* Badge liquidado total */}
+          {isFullyPaid && (
+            <div
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mt-3 text-sm font-semibold"
+              style={{ background: 'var(--success-bg)', color: 'var(--success)', border: '1px solid color-mix(in srgb, var(--success) 25%, transparent)' }}
+            >
+              <Sparkles className="w-4 h-4" />
+              ¡Crédito liquidado en su totalidad!
+            </div>
+          )}
         </div>
 
         {/* Cuerpo del recibo */}
-        <div className="p-6 space-y-6 text-sm">
-          
-          {/* Estado del pago */}
-          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span className="font-semibold text-emerald-950 dark:text-emerald-300 text-sm">
-                {receipt.status}
-              </span>
-            </div>
-            <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-white dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700">
-              AUDITADO
-            </span>
-          </div>
+        <div className="px-6 py-5 space-y-4">
 
-          {/* Cifra Principal */}
-          <div className="text-center py-2">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-              Monto Total Abonado
-            </span>
-            <div className="text-4xl font-extrabold text-slate-900 dark:text-white mt-1 font-mono tracking-tight">
-              ${receipt.amount.toFixed(2)} <span className="text-lg font-normal text-slate-500">USD</span>
-            </div>
-            <div className="text-xs text-slate-500 mt-1">
-              Liquidación de Cuota #{receipt.weekNumber} (Amortización Semanal)
-            </div>
-          </div>
-
-          {/* Detalles de Auditoría */}
-          <div className="space-y-2.5 pt-3 border-t border-dashed border-slate-200 dark:border-slate-800">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-500 flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-slate-400" /> No. de Referencia:
+          {/* Número de transacción y fecha */}
+          <div
+            className="rounded-2xl p-4 space-y-3"
+            style={{ background: 'var(--surface-1)' }}
+          >
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-2 font-medium" style={{ color: 'var(--ink-3)' }}>
+                <Hash className="w-3.5 h-3.5" />
+                ID de transacción
               </span>
-              <span className="font-mono font-medium text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded">
-                {receipt.referenceNumber}
+              <span
+                className="font-bold tracking-widest"
+                style={{ color: 'var(--ink-1)', fontFamily: 'var(--font-family-mono, monospace)', fontSize: '11px' }}
+              >
+                {transactionId}
               </span>
             </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-500 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" /> Fecha y hora:
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-2 font-medium" style={{ color: 'var(--ink-3)' }}>
+                <Calendar className="w-3.5 h-3.5" />
+                Fecha y hora
               </span>
-              <span className="font-medium text-slate-800 dark:text-slate-200">
+              <span className="font-semibold" style={{ color: 'var(--ink-1)' }}>
                 {formattedDate}
               </span>
             </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-500 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-slate-400" /> Titular Universitario:
+            <div className="flex items-start justify-between text-xs">
+              <span className="flex items-center gap-2 font-medium shrink-0" style={{ color: 'var(--ink-3)' }}>
+                <User className="w-3.5 h-3.5" />
+                Titular
               </span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">
-                {receipt.studentName} <span className="font-mono text-slate-400">({receipt.studentCedula})</span>
+              <span className="font-semibold text-right" style={{ color: 'var(--ink-1)' }}>
+                {receipt.studentName}
+                <br />
+                <span style={{ color: 'var(--ink-3)', fontFamily: 'var(--font-family-mono, monospace)', fontSize: '10px' }}>
+                  {receipt.studentCedula}
+                </span>
               </span>
             </div>
           </div>
 
-          {/* Desglose Financiero */}
-          <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs space-y-2">
-            <div className="flex justify-between text-slate-600 dark:text-slate-300">
-              <span>Abono a Capital Principal:</span>
-              <span className="font-mono font-medium">${receipt.principal.toFixed(2)}</span>
+          {/* Línea troquelada */}
+          <div className="relative py-1">
+            <hr className="divider-dashed" />
+            <div
+              className="absolute left-[-24px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full"
+              style={{ background: 'var(--surface-page)', border: '1.5px solid var(--border-strong)' }}
+            />
+            <div
+              className="absolute right-[-24px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full"
+              style={{ background: 'var(--surface-page)', border: '1.5px solid var(--border-strong)' }}
+            />
+          </div>
+
+          {/* Desglose financiero */}
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between" style={{ color: 'var(--ink-2)' }}>
+              <span>Capital principal amortizado</span>
+              <span className="font-mono font-medium" style={{ color: 'var(--ink-1)' }}>
+                ${receipt.principal.toFixed(2)}
+              </span>
             </div>
-            <div className="flex justify-between text-slate-600 dark:text-slate-300">
-              <span>Aporte Solidario al Fondo (8.5% anual):</span>
-              <span className="font-mono font-medium">${receipt.interest.toFixed(2)}</span>
+            <div className="flex justify-between" style={{ color: 'var(--ink-2)' }}>
+              <span>Aporte solidario al fondo (8.5% anual)</span>
+              <span className="font-mono font-medium" style={{ color: 'var(--brand)' }}>
+                ${receipt.interest.toFixed(2)}
+              </span>
             </div>
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex justify-between font-semibold text-slate-900 dark:text-white">
-              <span>Saldo Deudor Residual:</span>
-              <span className={`font-mono ${receipt.remainingLoanBalance === 0 ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>
+            <div
+              className="flex justify-between pt-2.5 border-t font-semibold text-sm"
+              style={{ borderColor: 'var(--border-subtle)', color: 'var(--ink-1)' }}
+            >
+              <span>Saldo deudor residual</span>
+              <span
+                className="font-mono"
+                style={{ color: isFullyPaid ? 'var(--success)' : 'var(--ink-1)' }}
+              >
                 ${receipt.remainingLoanBalance.toFixed(2)} USD
               </span>
             </div>
-            {receipt.remainingLoanBalance === 0 && (
-              <div className="mt-2 text-center p-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold flex items-center justify-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> ¡Has liquidado tu crédito en su totalidad! Tu cupo está renovado al 100%.
-              </div>
-            )}
           </div>
 
-          {/* Sello de seguridad digital */}
-          <div className="flex items-center justify-center gap-2 pt-2 text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800/80">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>Documento firmado electrónicamente · Encriptado SSL Módulo 10</span>
+          {/* Sello de seguridad */}
+          <div
+            className="flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-medium"
+            style={{
+              background: 'var(--success-bg)',
+              color: 'var(--success)',
+              border: '1px solid color-mix(in srgb, var(--success) 15%, transparent)',
+            }}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Documento firmado electrónicamente · SSL Módulo 10
+          </div>
+
+          {/* QR decorativo + referencia */}
+          <div
+            className="flex items-center gap-4 p-3.5 rounded-xl"
+            style={{ background: 'var(--surface-1)' }}
+          >
+            {/* QR simulado */}
+            <div
+              className="w-14 h-14 rounded-xl shrink-0 flex items-center justify-center"
+              style={{ background: 'var(--surface-2)' }}
+            >
+              <svg viewBox="0 0 40 40" className="w-10 h-10" style={{ color: 'var(--ink-1)' }}>
+                {/* QR pattern decorativo */}
+                <rect x="2" y="2" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <rect x="5" y="5" width="6" height="6" rx="0.5" fill="currentColor"/>
+                <rect x="26" y="2" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <rect x="29" y="5" width="6" height="6" rx="0.5" fill="currentColor"/>
+                <rect x="2" y="26" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <rect x="5" y="29" width="6" height="6" rx="0.5" fill="currentColor"/>
+                <rect x="18" y="2" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="18" y="8" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="18" y="18" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="24" y="18" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="30" y="18" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="18" y="24" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="24" y="24" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="30" y="30" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="18" y="30" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="36" y="24" width="2" height="8" rx="0.5" fill="currentColor"/>
+                <rect x="2" y="18" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="8" y="18" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="2" y="24" width="4" height="4" rx="0.5" fill="currentColor"/>
+                <rect x="8" y="24" width="4" height="4" rx="0.5" fill="currentColor"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-semibold" style={{ color: 'var(--ink-1)' }}>
+                Ref. UTB-{receipt.referenceNumber.slice(-6)}
+              </p>
+              <p className="text-[11px] mt-0.5" style={{ color: 'var(--ink-3)' }}>
+                Código de verificación oficial
+              </p>
+              <div
+                className="flex items-center gap-1 mt-1"
+                style={{ color: 'var(--brand)' }}
+              >
+                <GraduationCap className="w-3 h-3" />
+                <span className="text-[10px] font-bold uppercase tracking-wide">UTB Babahoyo</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Pie del Modal: Botones de Acción */}
-        <div className="p-4 px-6 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
+        {/* Footer — Acciones */}
+        <div
+          className="px-6 py-4 flex items-center justify-between gap-3 border-t"
+          style={{
+            borderColor: 'var(--border-subtle)',
+            background: 'var(--surface-1)',
+          }}
+        >
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition"
+            className="btn-ghost"
+            style={{ height: '38px', padding: '0 16px', fontSize: '13px', flex: 1 }}
           >
             Cerrar
           </button>
           <button
-            onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs shadow-xs transition transform hover:-translate-y-0.5 active:translate-y-0 duration-150"
+            onClick={() => window.print()}
+            className="btn-primary"
+            style={{ height: '38px', padding: '0 16px', fontSize: '13px', flex: 2 }}
           >
-            <Printer className="w-3.5 h-3.5" />
-            Imprimir / Descargar Recibo
+            <Download className="w-4 h-4" />
+            Descargar recibo
           </button>
         </div>
       </div>

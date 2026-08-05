@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const userProfile = await fetchUserProfile(userCred.user.uid);
       setProfile(userProfile);
-      return { success: true, role: userProfile?.role || (email.toLowerCase().includes('admin') ? 'admin' : 'student'), email: userCred.user.email };
+      return { success: true, role: userProfile?.role || 'student', email: userCred.user.email };
     } catch (error: any) {
       console.error('Error en login:', error);
       let msg = 'Credenciales no válidas o usuario no registrado.';
@@ -152,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const role: UserRole | null = profile?.role || (authUser ? 'student' : null);
+  const role: UserRole | null = profile?.role ?? null;
 
   return (
     <AuthContext.Provider value={{ authUser, profile, role, loading, logout, refreshProfile, login, register }}>

@@ -3,461 +3,576 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
-  GraduationCap, ArrowRight, ShieldCheck, Clock, DollarSign, 
-  Users, HelpCircle, ChevronRight, ChevronDown, Lock, CheckCircle2, 
-  Award, Sparkles, Sliders, Calendar, Zap, Check, ShieldAlert, BookOpen
+  GraduationCap, ArrowRight, ShieldCheck, Check,
+  Award, Sliders, ChevronDown, Zap, BookOpen, ShieldAlert,
 } from 'lucide-react';
 import { ThemeToggleButton } from '../components/theme/ThemeProvider';
+import { calculateWeeklyInstallmentAmount } from '../lib/financial/amortization';
 
 export default function LandingPage() {
-  // Estado para la calculadora interactiva rápida en vivo del Hero
   const [simAmount, setSimAmount] = useState<number>(20);
   const [simWeeks, setSimWeeks] = useState<number>(4);
-
-  // Estado para las pestañas interactivas de Garantías (Estudiante vs Garante)
   const [guaranteeTab, setGuaranteeTab] = useState<'student' | 'guarantor'>('student');
-
-  // Estado para el acordeón interactivo de Preguntas Frecuentes (FAQ)
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  // Cálculo financiero ágil y transparente (Tasa 8.5% anual prorrateada por semana)
-  const weeklyRate = (0.085 / 52);
-  const totalRepayment = simAmount * (1 + weeklyRate * simWeeks);
-  const weeklyInstallment = totalRepayment / simWeeks;
-  const totalInterest = totalRepayment - simAmount;
+  // Bug 5 fix: usar el motor oficial de amortización compuesta, igual que el simulador del dashboard.
+  // El método anterior usaba interés simple (simAmount * (1 + rate * weeks)) que daba valores distintos.
+  const weeklyInstallment = calculateWeeklyInstallmentAmount(simAmount, simWeeks);
+  const totalRepayment = Math.round(weeklyInstallment * simWeeks * 100) / 100;
+  const totalInterest = Math.round((totalRepayment - simAmount) * 100) / 100;
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#090D16] text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300 font-sans selection:bg-emerald-500/30">
-      
-      {/* NAVEGACIÓN INSTITUCIONAL */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#090D16]/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 font-semibold text-slate-900 dark:text-white hover:opacity-90 transition group">
-            <div className="p-1.5 rounded-lg bg-emerald-700 dark:bg-emerald-600 text-white shadow-sm transform group-hover:rotate-6 transition-transform duration-200">
-              <GraduationCap className="w-5 h-5" />
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--surface-page)', color: 'var(--ink-1)' }}>
+
+      {/* ── NAVBAR ─────────────────────────────────────────── */}
+      <header
+        className="sticky top-0 z-40 backdrop-blur-md border-b transition-colors"
+        style={{
+          background: 'color-mix(in srgb, var(--surface-0) 88%, transparent)',
+          borderColor: 'var(--border-subtle)',
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md"
+              style={{ background: 'linear-gradient(135deg, var(--brand) 0%, #2563EB 100%)' }}
+            >
+              <GraduationCap className="w-5 h-5 text-white" />
             </div>
-            <span className="tracking-tight font-bold text-lg">EduCrédito <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">UTB</span></span>
+            <span className="font-extrabold text-[16px] tracking-tight" style={{ color: 'var(--ink-1)' }}>
+              EduCrédito <span className="text-gradient-brand font-black">UTB</span>
+            </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
-            <a href="#simulador" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Calculadora</a>
-            <a href="#como-funciona" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Cómo funciona</a>
-            <a href="#garante-interactivo" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Respaldo solidario</a>
-            <a href="#faq" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Preguntas frecuentes</a>
+          <nav className="hidden md:flex items-center gap-7 text-sm font-medium" style={{ color: 'var(--ink-2)' }}>
+            <a href="#como-funciona" className="hover:text-[var(--brand)] transition-colors">Cómo funciona</a>
+            <a href="#simulador" className="hover:text-[var(--brand)] transition-colors">Calculadora</a>
+            <a href="#garantias" className="hover:text-[var(--brand)] transition-colors">Garantías</a>
+            <a href="#faq" className="hover:text-[var(--brand)] transition-colors">Preguntas</a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <ThemeToggleButton />
-            <Link 
+            <Link
               href="/login"
-              className="h-9 px-4 rounded-lg text-xs font-semibold bg-slate-200/70 hover:bg-slate-300/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition flex items-center"
+              className="btn-ghost"
+              style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}
             >
               Iniciar sesión
             </Link>
             <Link
               href="/register"
-              className="h-9 px-4 rounded-lg text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs transition transform active:scale-95 hidden sm:flex items-center"
+              className="btn-primary hidden sm:inline-flex"
+              style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}
             >
-              Registro con Cédula
+              Registrarse
             </Link>
           </div>
         </div>
       </header>
 
-      {/* SECCIÓN HERO Minimalista con Profundidad y Luz Ambiental */}
-      <section className="relative px-6 pt-16 pb-20 border-b border-slate-200 dark:border-slate-800 overflow-hidden">
-        
-        {/* Luces Ambientales (Glassmorphism sutil, sin saturación) */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-emerald-600/15 via-emerald-500/5 to-blue-600/10 blur-[130px] rounded-full pointer-events-none -z-10" />
+      {/* ── HERO SPLIT CON ESFERAS DE BRIGHT GLOW VIBRANTES ──────────────── */}
+      <section className="flex-1 border-b relative overflow-hidden" style={{ borderColor: 'var(--border-subtle)' }}>
+        {/* Orbs radiantes y flotantes en el fondo (Atmosfera dinámica) */}
+        <div className="glow-orb glow-orb-brand w-[480px] h-[480px] -top-32 -left-32 animate-float" />
+        <div className="glow-orb glow-orb-blue w-[420px] h-[420px] bottom-0 -right-24 animate-glow" />
+        <div className="glow-orb glow-orb-brand w-[280px] h-[280px] top-1/3 left-1/2 -translate-x-1/2 opacity-30 animate-float" style={{ animationDelay: '2s' }} />
 
-        <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
-          
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold border border-emerald-300/60 dark:border-emerald-800 shadow-xs animate-fadeIn">
-            <Award className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>Tu comunidad te respalda: Microcréditos exclusivos para estudiantes.</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight sm:leading-[1.15]">
-            Microcréditos Universitarios <br className="hidden sm:inline" />
-            <span className="text-emerald-700 dark:text-emerald-400 bg-clip-text">Justos, Claros y Sin Buró de Crédito.</span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Un fondo solidario autogestionado para financiar tus materiales, libros de especialidad y viáticos académicos. Tasa fija institucional del 8.5% anual con cuotas flexibles y transparentes.
-          </p>
-
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="#simulador"
-              className="w-full sm:w-auto h-12 px-8 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition shadow-md hover:shadow-emerald-700/25 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 duration-150 group"
-            >
-              <span>Calcula tu cuota gratis</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </a>
-            <Link
-              href="/login"
-              className="w-full sm:w-auto h-12 px-8 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-semibold text-sm transition flex items-center justify-center shadow-xs"
-            >
-              Ingresar a mi cuenta
-            </Link>
-          </div>
-
-          <div className="pt-8 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-semibold text-slate-600 dark:text-slate-300">
-            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" /> Validación rápida con tu cédula</span>
-            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" /> Pagos flexibles a tu ritmo</span>
-            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" /> 100% transparente: Cero comisiones ocultas</span>
-          </div>
-        </div>
-
-        {/* CALCULADORA INTERACTIVA EN VIVO (HERO COMPREHENSIVE COMPONENT) */}
-        <div id="simulador" className="max-w-4xl mx-auto mt-16 p-6 sm:p-8 rounded-2xl bg-white/80 dark:bg-[#0E1422]/90 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800/90 shadow-2xl relative z-20">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
-                <Sliders className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">Simulador Interactivo en Vivo</h3>
-                <p className="text-xs text-slate-500">Prueba cómo quedarían tus cuotas de repago semanal</p>
-              </div>
-            </div>
-            <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Tasa Fija Solidaria: 8.5% Anual
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="max-w-6xl mx-auto px-6 py-16 lg:py-24 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             
-            {/* Controles de monto y plazo */}
-            <div className="lg:col-span-7 space-y-6">
-              
-              {/* Monto deseado */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <span>Monto que deseas solicitar ($10 a $30 USD):</span>
-                  <span className="text-base font-mono font-extrabold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                    ${simAmount}.00 USD
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min="10"
-                    max="30"
-                    step="5"
-                    value={simAmount}
-                    onChange={(e) => setSimAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-                  />
-                </div>
-                <div className="flex justify-between text-[11px] text-slate-400 font-medium px-1">
-                  <span>$10 (Min)</span>
-                  <span>$15</span>
-                  <span>$20</span>
-                  <span>$25</span>
-                  <span>$30 (Máx)</span>
-                </div>
+            {/* Columna izquierda — Copy institucional */}
+            <div className="space-y-7 animate-fadein">
+              <div
+                className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold border shadow-xs transition-transform hover:scale-[1.02] duration-200 cursor-default"
+                style={{
+                  background: 'color-mix(in srgb, var(--brand) 12%, var(--surface-0))',
+                  color: 'var(--brand)',
+                  borderColor: 'color-mix(in srgb, var(--brand) 30%, transparent)',
+                }}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <Award className="w-4 h-4" style={{ color: 'var(--brand)' }} />
+                Tu comunidad te respalda: Fondo Autogestionado UTB
               </div>
 
-              {/* Plazo del crédito en semanas */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Selecciona el plazo para abonar tu microcrédito:
-                </label>
-                <select
-                  value={simWeeks}
-                  onChange={(e) => setSimWeeks(Number(e.target.value))}
-                  className="w-full h-11 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition cursor-pointer"
+              <div>
+                <h1
+                  className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.08]"
+                  style={{ color: 'var(--ink-1)' }}
                 >
-                  {[1, 2, 3, 4, 6, 8, 10, 12].map((w) => (
-                    <option key={w} value={w}>
-                      {w} {w === 1 ? 'semana' : 'semanas'} de plazo ({w} {w === 1 ? 'cuota semanal' : 'cuotas semanales'})
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[11px] text-slate-500 italic">
-                  * Recuerda que cuentas con 7 días calendario de gracia inicial antes de tu primer cobro.
+                  Microcréditos universitarios.{' '}
+                  <span className="text-gradient-brand block mt-1">
+                    Justos, claros y sin buró.
+                  </span>
+                </h1>
+                <p
+                  className="mt-5 text-base sm:text-lg leading-relaxed max-w-xl font-normal"
+                  style={{ color: 'var(--ink-2)' }}
+                >
+                  Un fondo solidario diseñado y autogestionado en la UTB para financiar tus libros, insumos y viáticos académicos. 
+                  Tasa solidaria del <strong className="text-gradient-brand font-bold">8.5% anual</strong> con repago adaptado a tus clases.
                 </p>
               </div>
 
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a href="#simulador" className="btn-primary">
+                  <span>Calcula tu cuota gratis</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+                <Link href="/login" className="btn-ghost">
+                  Acceder al portal
+                </Link>
+              </div>
+
+              {/* 3 checkmarks sin bullets */}
+              <div className="pt-2 space-y-2.5">
+                {[
+                  'Sin historial bancario ni buró de crédito',
+                  'Cuotas semanales adaptadas al calendario académico',
+                  '100% transparente — cero comisiones ocultas',
+                ].map((text) => (
+                  <p key={text} className="flex items-center gap-2.5 text-sm" style={{ color: 'var(--ink-2)' }}>
+                    <span
+                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: 'var(--brand-muted)' }}
+                    >
+                      <Check className="w-3 h-3" style={{ color: 'var(--brand)' }} />
+                    </span>
+                    {text}
+                  </p>
+                ))}
+              </div>
             </div>
 
-            {/* Resultado Financiero Transparente */}
-            <div className="lg:col-span-5 p-6 rounded-xl bg-gradient-to-br from-emerald-900 to-slate-900 text-white shadow-xl flex flex-col justify-between space-y-4 border border-emerald-500/20">
-              <div>
-                <span className="text-[11px] font-medium text-emerald-300 uppercase tracking-wider block">
-                  Tu cuota estimada por semana
-                </span>
-                <div className="text-4xl font-extrabold font-mono mt-1 tracking-tight">
-                  ${weeklyInstallment.toFixed(2)} <span className="text-sm font-normal text-slate-300">/ sem</span>
-                </div>
-              </div>
-
-              <div className="space-y-1.5 pt-3 border-t border-white/10 text-xs">
-                <div className="flex justify-between text-slate-300">
-                  <span>Capital neto solicitado:</span>
-                  <span className="font-mono font-semibold text-white">${simAmount.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-slate-300">
-                  <span>Interés cooperatorio (8.5% anual):</span>
-                  <span className="font-mono font-semibold text-emerald-300">${totalInterest.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-white pt-1 border-t border-white/5">
-                  <span>Total a devolver al fondo:</span>
-                  <span className="font-mono">${totalRepayment.toFixed(2)} USD</span>
-                </div>
-              </div>
-
-              <Link
-                href={`/register?amount=${simAmount}&weeks=${simWeeks}`}
-                className="w-full py-3 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs uppercase tracking-wide text-center transition transform active:scale-95 shadow-lg flex items-center justify-center gap-2"
+            {/* Columna derecha — Calculadora interactiva flotante con Glassmorphism */}
+            <div id="simulador" className="animate-fadein transition-transform duration-500 hover:-translate-y-1">
+              <div
+                className="rounded-3xl overflow-hidden card-glass border-2 shadow-2xl relative"
+                style={{
+                  borderColor: 'color-mix(in srgb, var(--brand) 35%, transparent)',
+                }}
               >
-                <Zap className="w-4 h-4 fill-slate-950" /> ¡Solicitar este cupo ahora!
-              </Link>
+                {/* Cabecera de la calculadora */}
+                <div
+                  className="px-6 py-4 border-b flex items-center justify-between backdrop-blur-md"
+                  style={{ 
+                    borderColor: 'color-mix(in srgb, var(--border-subtle) 60%, transparent)',
+                    background: 'color-mix(in srgb, var(--brand) 6%, transparent)' 
+                  }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                      <Sliders className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <span className="font-bold text-sm tracking-tight" style={{ color: 'var(--ink-1)' }}>
+                      Terminal de Simulación en Vivo
+                    </span>
+                  </div>
+                  <span
+                    className="text-xs font-bold px-3 py-1 rounded-full border animate-pulse"
+                    style={{ 
+                      background: 'color-mix(in srgb, var(--brand) 15%, var(--surface-0))', 
+                      color: 'var(--brand)',
+                      borderColor: 'color-mix(in srgb, var(--brand) 30%, transparent)' 
+                    }}
+                  >
+                    ⚡ 8.5% anual · Tasa fija
+                  </span>
+                </div>
+
+                {/* Controles */}
+                <div className="p-7 space-y-7">
+                  {/* Slider de monto */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold" style={{ color: 'var(--ink-2)' }}>
+                        Monto a solicitar
+                      </label>
+                      <span
+                        className="text-2xl font-black tabular-nums text-gradient-brand"
+                        style={{ fontFamily: 'var(--font-mono)' }}
+                      >
+                        ${simAmount}.00 USD
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="30"
+                      step="5"
+                      value={simAmount}
+                      onChange={(e) => setSimAmount(Number(e.target.value))}
+                      className="w-full h-2 rounded-full appearance-none cursor-pointer shadow-inner transition-all duration-150"
+                      style={{ background: 'var(--surface-2)', accentColor: 'var(--brand)' }}
+                    />
+                    <div
+                      className="flex justify-between text-xs font-semibold"
+                      style={{ color: 'var(--ink-3)' }}
+                    >
+                      <span className="hover:text-[var(--brand)] transition-colors cursor-pointer" onClick={() => setSimAmount(10)}>$10 mín.</span>
+                      <span className="hover:text-[var(--brand)] transition-colors cursor-pointer" onClick={() => setSimAmount(15)}>$15</span>
+                      <span className="hover:text-[var(--brand)] transition-colors cursor-pointer" onClick={() => setSimAmount(20)}>$20</span>
+                      <span className="hover:text-[var(--brand)] transition-colors cursor-pointer" onClick={() => setSimAmount(25)}>$25</span>
+                      <span className="hover:text-[var(--brand)] transition-colors cursor-pointer" onClick={() => setSimAmount(30)}>$30 máx.</span>
+                    </div>
+                  </div>
+
+                  {/* Plazo — Alineado a las reglas cooperativas [1, 2, 4, 8] */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold" style={{ color: 'var(--ink-2)' }}>
+                      Plazo de repago reglamentario
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={simWeeks}
+                        onChange={(e) => setSimWeeks(Number(e.target.value))}
+                        className="input-bank font-semibold text-sm appearance-none pr-10 border-2 transition-all hover:border-[var(--brand)]"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <option value={1}>1 semana — (1 cuota semanal)</option>
+                        <option value={2}>2 semanas — (15 días · 2 cuotas)</option>
+                        <option value={4}>4 semanas — (1 mes · 4 cuotas)</option>
+                        <option value={8}>8 semanas — (2 meses · 8 cuotas)</option>
+                      </select>
+                      <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-60" style={{ color: 'var(--ink-1)' }} />
+                    </div>
+                  </div>
+
+                  {/* Resultado radiante */}
+                  <div
+                    className="rounded-2xl p-6 space-y-4 border relative overflow-hidden transition-all duration-300"
+                    style={{ 
+                      background: 'color-mix(in srgb, var(--brand) 5%, var(--surface-0))',
+                      borderColor: 'color-mix(in srgb, var(--brand) 25%, transparent)',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.04)'
+                    }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-gradient-brand">
+                          Cuota semanal estimada
+                        </p>
+                        <p
+                          className="text-4xl font-black tabular-nums mt-1 tracking-tight"
+                          style={{ color: 'var(--ink-1)', fontFamily: 'var(--font-mono)' }}
+                        >
+                          ${weeklyInstallment.toFixed(2)}
+                          <span className="text-sm font-bold opacity-70 ml-1.5 font-sans">
+                            / sem
+                          </span>
+                        </p>
+                      </div>
+                      <div
+                        className="text-right text-xs space-y-1 font-medium bg-[var(--surface-0)] p-2.5 rounded-xl border border-[var(--border-subtle)]"
+                        style={{ color: 'var(--ink-2)' }}
+                      >
+                        <p>Capital: <strong className="font-mono" style={{ color: 'var(--ink-1)' }}>${simAmount.toFixed(2)}</strong></p>
+                        <p>Interés: <strong className="font-mono text-emerald-600 dark:text-emerald-400">${totalInterest.toFixed(2)}</strong></p>
+                        <p className="border-t pt-1 mt-1 border-[var(--border-subtle)] font-bold">Total: <strong className="font-mono text-gradient-brand">${totalRepayment.toFixed(2)}</strong></p>
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/register?amount=${simAmount}&weeks=${simWeeks}`}
+                      className="btn-primary w-full h-12 text-base font-bold shadow-lg shadow-emerald-500/25 transition-transform duration-200 hover:scale-[1.01]"
+                    >
+                      <Zap className="w-5 h-5 fill-white animate-bounce" />
+                      Solicitar este cupo estudiantil ahora
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* CÓMO FUNCIONA - TARJETAS INTERACTIVAS CON HOVER EFECTOS */}
-      <section id="como-funciona" className="py-24 px-6 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-5xl mx-auto space-y-12">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider flex items-center gap-1.5">
-              <Zap className="w-4 h-4" /> Metodología Financiera
+      {/* ── CÓMO FUNCIONA ──────────────────────────────────── */}
+      <section
+        id="como-funciona"
+        className="py-20 px-6 border-b"
+        style={{ background: 'var(--surface-0)', borderColor: 'var(--border-subtle)' }}
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="max-w-xl mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--brand)' }}>
+              Proceso simple
             </p>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
-              Un proceso ágil diseñado en torno al calendario académico
+            <h2
+              className="text-3xl font-bold tracking-tight"
+              style={{ color: 'var(--ink-1)' }}
+            >
+              Diseñado en torno al calendario académico
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-              Sin trámites bancarios complejos. Validamos tu identidad mediante tu cédula y el respaldo de la comunidad de la UTB.
+            <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+              Sin trámites bancarios complejos. Tu cédula y el respaldo de tu comunidad UTB son suficientes.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            <div className="group p-7 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#0E1422] space-y-4 hover:border-emerald-500/80 dark:hover:border-emerald-500/60 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 transform hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-black text-lg shadow-xs group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
-                1
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                n: '01',
+                title: 'Elige tu cupo',
+                desc: 'Selecciona tu monto ($10–$30 USD) y tu plazo reglamentario de 1 a 8 semanas en el terminal en vivo.',
+              },
+              {
+                n: '02',
+                title: 'Verifica a tu garante',
+                desc: 'Registra la cédula o correo de tu compañero de facultad. Si cursas 1er semestre, debe cursar 2do o superior.',
+              },
+              {
+                n: '03',
+                title: 'Cuotas solidarias',
+                desc: 'Recibe el desembolso con 7 días de gracia inicial y cuotas semanales fijas. Al finalizar, tu cupo se renueva 100%.',
+              },
+            ].map((step) => (
+              <div
+                key={step.n}
+                className="card card-hover p-8 relative overflow-hidden group cursor-default"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full pointer-events-none group-hover:from-emerald-500/20 transition-all duration-300" />
+                <span
+                  className="text-5xl font-black tabular-nums block mb-5 leading-none transition-transform duration-300 group-hover:scale-110"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                >
+                  <span className="text-gradient-brand opacity-40 group-hover:opacity-100 transition-opacity">{step.n}</span>
+                </span>
+                <h3 className="text-lg font-extrabold mb-2.5 group-hover:text-[var(--brand)] transition-colors" style={{ color: 'var(--ink-1)' }}>
+                  {step.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+                  {step.desc}
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                Elige tu cupo en línea
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Escribe el monto que deseas solicitar (desde $10 hasta $30 USD) y abre la lista desplegable para seleccionar tu plazo de repago de 1 a 12 semanas de acuerdo a tus necesidades.
-              </p>
-            </div>
-
-            <div className="group p-7 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#0E1422] space-y-4 hover:border-emerald-500/80 dark:hover:border-emerald-500/60 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 transform hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-black text-lg shadow-xs group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
-                2
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                Verifica tu Garante UTB
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Registra la cédula de tu compañero garante. Si eres estudiante de primer semestre, el sistema verifica que tu garante curse el segundo semestre o superior para darte respaldo.
-              </p>
-            </div>
-
-            <div className="group p-7 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#0E1422] space-y-4 hover:border-emerald-500/80 dark:hover:border-emerald-500/60 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 transform hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-black text-lg shadow-xs group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
-                3
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                Repago semanal flexible
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Recibe el desembolso institucional con 7 días completos de gracia inicial y realiza tus abonos obligatorios con cuotas fijas semanales para recuperar e incrementar tu historial.
-              </p>
-            </div>
-
+            ))}
           </div>
         </div>
       </section>
 
-      {/* GARANTÍAS Y RESPALDO CON PESTAÑAS INTERACTIVAS */}
-      <section id="garante-interactivo" className="py-24 px-6 bg-slate-50/70 dark:bg-[#0B0F1A] border-b border-slate-200 dark:border-slate-800 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto space-y-12">
-          
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">
-              Compromiso Solidario Universitario
-            </span>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+      {/* ── GARANTÍAS ──────────────────────────────────────── */}
+      <section
+        id="garantias"
+        className="py-20 px-6 border-b"
+        style={{ background: 'var(--surface-page)', borderColor: 'var(--border-subtle)' }}
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--brand)' }}>
+              Compromiso solidario
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--ink-1)' }}>
               Un ecosistema donde ganamos todos
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Explora cómo funciona nuestra estructura de confianza colectiva para cada uno de los roles dentro del fondo rotativo.
-            </p>
+          </div>
 
-            {/* Selector interactivo de rol */}
-            <div className="inline-flex p-1.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 mt-4 border border-slate-300/60 dark:border-slate-700/80">
-              <button
-                type="button"
-                onClick={() => setGuaranteeTab('student')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  guaranteeTab === 'student'
-                    ? 'bg-white dark:bg-emerald-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                👨‍🎓 Para el Estudiante Solicitante
-              </button>
-              <button
-                type="button"
-                onClick={() => setGuaranteeTab('guarantor')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  guaranteeTab === 'guarantor'
-                    ? 'bg-white dark:bg-emerald-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                🤝 Para el Garante Solidario
-              </button>
+          {/* Selector de rol */}
+          <div className="flex justify-center mb-10">
+            <div
+              className="inline-flex p-1 rounded-xl border"
+              style={{ background: 'var(--surface-1)', borderColor: 'var(--border-subtle)' }}
+            >
+              {[
+                { key: 'student' as const, label: 'Estudiante solicitante' },
+                { key: 'guarantor' as const, label: 'Garante solidario' },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setGuaranteeTab(tab.key)}
+                  className="px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150"
+                  style={{
+                    background: guaranteeTab === tab.key ? 'var(--surface-0)' : 'transparent',
+                    color: guaranteeTab === tab.key ? 'var(--ink-1)' : 'var(--ink-3)',
+                    boxShadow: guaranteeTab === tab.key ? 'var(--shadow-sm)' : 'none',
+                    fontWeight: guaranteeTab === tab.key ? '600' : '400',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Contenido Dinámico según la Pestaña Seleccionada */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {guaranteeTab === 'student' ? (
-              <div className="space-y-6 animate-fadeIn">
-                <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950 text-emerald-600 rounded-xl">
-                      <BookOpen className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Sin obstáculos comerciales</h3>
+              <div
+                key="student"
+                className="card p-6 space-y-4 animate-fadein"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: 'var(--brand-muted)' }}
+                  >
+                    <BookOpen className="w-5 h-5" style={{ color: 'var(--brand)' }} />
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Sabemos que en tu etapa universitaria aún no posees un historial bancario formal. Aquí tu principal activo es tu constancia académica en la UTB y el compañerismo solidario de tus colegas de facultad.
-                  </p>
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> No revisamos centrales de riesgo ni burós bancarios externos.</div>
-                    <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> Liberación inmediata y renovación al cancelar tus cuotas semanales.</div>
-                    <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> Comprobante digital bancario descargable en cada abono realizado.</div>
-                  </div>
+                  <h3 className="font-bold text-base" style={{ color: 'var(--ink-1)' }}>Sin obstáculos comerciales</h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+                  Tu principal activo es tu constancia académica en la UTB y el compañerismo solidario de tus colegas de facultad. No revisamos burós externos.
+                </p>
+                <div className="pt-3 space-y-2.5 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                  {[
+                    'Sin centrales de riesgo ni historial bancario requerido',
+                    'Renovación inmediata al liquidar tus cuotas',
+                    'Comprobante digital descargable en cada abono',
+                  ].map((item) => (
+                    <p key={item} className="flex items-center gap-2 text-sm" style={{ color: 'var(--ink-2)' }}>
+                      <Check className="w-4 h-4 shrink-0" style={{ color: 'var(--brand)' }} />
+                      {item}
+                    </p>
+                  ))}
                 </div>
               </div>
             ) : (
-              <div className="space-y-6 animate-fadeIn">
-                <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1422] border-2 border-emerald-500/50 shadow-sm space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950 text-emerald-600 rounded-xl">
-                      <ShieldCheck className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Respaldando a tus compañeros</h3>
+              <div
+                key="guarantor"
+                className="card p-6 space-y-4 animate-fadein"
+                style={{ borderColor: 'color-mix(in srgb, var(--brand) 30%, transparent)', borderWidth: '1.5px' }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: 'var(--brand-muted)' }}
+                  >
+                    <ShieldCheck className="w-5 h-5" style={{ color: 'var(--brand)' }} />
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Un estudiante de cursos avanzados puede ser garante solidario de uno o varios compañeros de su facultad, fomentando un lazo de apoyo mutuo para que nadie se quede sin estudiar por falta de materiales.
+                  <h3 className="font-bold text-base" style={{ color: 'var(--ink-1)' }}>Respaldando a tus compañeros</h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+                  Un estudiante de cursos avanzados puede ser garante solidario de uno o varios compañeros de su facultad, fomentando un lazo de apoyo mutuo.
+                </p>
+                <div className="pt-3 space-y-2.5 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <p className="flex items-center gap-2 text-sm" style={{ color: 'var(--ink-2)' }}>
+                    <Check className="w-4 h-4 shrink-0" style={{ color: 'var(--brand)' }} />
+                    Garantías múltiples permitidas con buena conducta crediticia
                   </p>
-                  <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0" /> Garantías múltiples permitidas para estudiantes con buena conducta.</div>
-                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold"><ShieldAlert className="w-4 h-4 shrink-0" /> Notificación automática al garante si el solicitante acumula 2 o más semanas en mora.</div>
-                  </div>
+                  <p className="flex items-center gap-2 text-sm" style={{ color: 'var(--warning)' }}>
+                    <ShieldAlert className="w-4 h-4 shrink-0" />
+                    Recibes notificación si tu garantizado acumula 2+ semanas en mora
+                  </p>
                 </div>
               </div>
             )}
 
-            {/* Resumen constante en vivo */}
-            <div className="p-8 rounded-2xl bg-white dark:bg-[#0E1422] border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Parámetros del Fondo Rotativo</h3>
-              
-              <div className="space-y-3 text-xs">
-                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white">Cupo Mínimo Disponible</p>
-                    <p className="text-slate-500 mt-0.5">Apoyo directo para copias, guías e insumos</p>
-                  </div>
-                  <span className="text-lg font-black font-mono text-emerald-700 dark:text-emerald-400">$10.00</span>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white">Cupo Máximo Disponible</p>
-                    <p className="text-slate-500 mt-0.5">Tope institucional por cada estudiante</p>
-                  </div>
-                  <span className="text-lg font-black font-mono text-emerald-700 dark:text-emerald-400">$30.00</span>
-                </div>
-
-                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white">Plazo Cooperativo Semanal</p>
-                    <p className="text-slate-500 mt-0.5">Sincronizado con tus viáticos académicos</p>
-                  </div>
-                  <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">1 a 12 Semanas</span>
-                </div>
+            {/* Parámetros del fondo con efecto card-hover */}
+            <div className="card card-hover p-7 space-y-5 border-2 relative overflow-hidden" style={{ borderColor: 'color-mix(in srgb, var(--brand) 25%, transparent)' }}>
+              <div className="flex items-center justify-between">
+                <h3 className="font-extrabold text-lg text-gradient-brand">Parámetros del Fondo Rotativo</h3>
+                <span className="badge badge-success font-bold">UTB Activo</span>
               </div>
-              
-              <Link 
+              <div className="space-y-3">
+                {[
+                  { label: 'Cupo mínimo', value: '$10.00', sub: 'Para copias, guías e insumos' },
+                  { label: 'Cupo máximo', value: '$30.00', sub: 'Tope institucional por estudiante' },
+                  { label: 'Plazos permitidos', value: '1, 2, 4 y 8 sem.', sub: 'Sincronizado con tus viáticos' },
+                  { label: 'Tasa solidaria', value: '8.5% anual', sub: 'Fija e institucional, sin comisiones' },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between p-4 rounded-2xl border transition-colors hover:border-[var(--brand)]"
+                    style={{ background: 'var(--surface-1)', borderColor: 'var(--border-subtle)' }}
+                  >
+                    <div>
+                      <p className="text-sm font-bold" style={{ color: 'var(--ink-1)' }}>{item.label}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--ink-3)' }}>{item.sub}</p>
+                    </div>
+                    <span
+                      className="font-black text-base tabular-nums bg-[var(--surface-0)] px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] shadow-xs"
+                      style={{ color: 'var(--brand)', fontFamily: 'var(--font-mono)' }}
+                    >
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Link
                 href="/register"
-                className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-xs transition flex items-center justify-center gap-2 transform active:scale-95"
+                className="btn-primary w-full h-11 text-base font-bold shadow-md shadow-emerald-500/20"
+                style={{ marginTop: '8px' }}
               >
-                Registrarme en la plataforma UTB
+                Registrarme en la comunidad
               </Link>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* PREGUNTAS FRECUENTES (FAQ ACORDEÓN INTERACTIVO) */}
-      <section id="faq" className="py-24 px-6 bg-white dark:bg-[#090D16]">
-        <div className="max-w-3xl mx-auto space-y-12">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Preguntas Frecuentes y Ayuda
+      {/* ── FAQ ────────────────────────────────────────────── */}
+      <section
+        id="faq"
+        className="py-20 px-6 border-b"
+        style={{ background: 'var(--surface-0)', borderColor: 'var(--border-subtle)' }}
+      >
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-12 text-center">
+            <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--ink-1)' }}>
+              Preguntas frecuentes
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Haz clic en cualquier pregunta para expandir su respuesta oficial.
+            <p className="mt-2 text-sm" style={{ color: 'var(--ink-2)' }}>
+              Todo lo que necesitas saber antes de solicitar tu microcrédito.
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {[
               {
-                q: "¿Cómo funciona el calendario del repago semanal?",
-                a: "El calendario de amortización programa las cuotas semanalmente para coincidir de forma ordenada con tus viáticos universitarios. Además, el sistema te otorga 7 días exactos de gracia inicial desde el desembolso antes de tu primera cuota hábil."
+                q: '¿Cómo funciona el calendario de repago semanal?',
+                a: 'El sistema programa las cuotas semanalmente y te otorga 7 días exactos de gracia inicial desde el desembolso antes de tu primera cuota.',
               },
               {
-                q: "¿Para qué sirve declarar el promedio general del semestre anterior?",
-                a: "Es una nota informativa de valor curricular para la secretaría administrativa de la UTB que supervisa la aprobación o rechazo del crédito. Te pedimos declararlo con total veracidad en el formulario de solicitud."
+                q: '¿Para qué se usa el promedio del semestre anterior?',
+                a: 'Es una nota informativa de valor curricular para la secretaría administrativa que supervisa la aprobación. Te pedimos declararlo con veracidad en el formulario.',
               },
               {
-                q: "¿Qué sucede con el garante solidario si un estudiante se atrasa en sus pagos?",
-                a: "Si un estudiante acumula dos semanas o más en mora de sus cuotas semanales, el saldo pendiente pasará a reportarse automáticamente en el portal de su compañero garante, para que puedan coordinar responsablemente el pago y mantener la reputación crediticia del grupo."
+                q: '¿Qué sucede con el garante si un estudiante se atrasa?',
+                a: 'Si acumulas dos semanas o más en mora, el saldo pendiente se reporta en el portal de tu garante para que coordinen el pago responsablemente.',
               },
               {
-                q: "¿Puedo cancelar o abonar todas las cuotas antes de tiempo?",
-                a: "¡Sí! Dentro del portal estudiantil puedes liquidar tus cuotas anticipadamente o abonar la totalidad en cualquier momento. Esto generará de inmediato tu recibo bancario digital y renovará el 100% de tu cupo disponible."
+                q: '¿Puedo cancelar todas las cuotas antes de tiempo?',
+                a: '¡Sí! En tu portal puedes liquidar anticipadamente. Recibirás tu recibo digital de inmediato y tu cupo se renovará al 100%.',
               },
               {
-                q: "¿Cómo obtengo mi recibo oficial al realizar el pago de mis cuotas?",
-                a: "Cada vez que registres el pago de una cuota desde tu panel de estudiante, el sistema generará de forma automática en vivo un Comprobante Electrónico Institucional encriptado SSL Módulo 10, con opción de descarga e impresión."
-              }
+                q: '¿Cómo obtengo mi comprobante de pago?',
+                a: 'Cada pago registrado genera automáticamente un comprobante electrónico institucional encriptado SSL, descargable e imprimible.',
+              },
             ].map((faq, idx) => {
               const isOpen = openFaq === idx;
               return (
-                <div 
-                  key={idx} 
-                  className="rounded-xl border border-slate-200 dark:border-slate-800/90 overflow-hidden transition-all duration-200"
+                <div
+                  key={idx}
+                  className="rounded-xl border overflow-hidden transition-all"
+                  style={{ borderColor: isOpen ? 'color-mix(in srgb, var(--brand) 25%, transparent)' : 'var(--border-subtle)' }}
                 >
                   <button
                     type="button"
                     onClick={() => toggleFaq(idx)}
-                    className="w-full p-5 text-left bg-slate-50/50 dark:bg-[#0E1422] hover:bg-slate-100/60 dark:hover:bg-slate-900 transition flex items-center justify-between gap-4 font-bold text-sm text-slate-900 dark:text-white"
+                    className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 transition-colors"
+                    style={{
+                      background: isOpen ? 'var(--brand-muted)' : 'var(--surface-0)',
+                      color: 'var(--ink-1)',
+                    }}
                   >
-                    <span>{faq.q}</span>
-                    <ChevronDown className={`w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                    <span className="text-sm font-semibold">{faq.q}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                      style={{ color: 'var(--brand)' }}
+                    />
                   </button>
                   {isOpen && (
-                    <div className="p-5 pt-3 bg-white dark:bg-[#0E1422]/60 text-xs text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800/80 animate-fadeIn">
+                    <div
+                      className="px-5 py-4 text-sm leading-relaxed border-t animate-fadein"
+                      style={{ color: 'var(--ink-2)', borderColor: 'var(--border-subtle)' }}
+                    >
                       {faq.a}
                     </div>
                   )}
@@ -468,26 +583,36 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* PIE DE PÁGINA SOBRIO BANCARIO */}
-      <footer className="mt-auto py-12 px-6 bg-slate-900 text-slate-400 border-t border-slate-800 text-xs">
+      {/* ── FOOTER ─────────────────────────────────────────── */}
+      <footer className="py-12 px-6" style={{ background: 'var(--ink-1)' }}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 font-semibold text-white">
-            <GraduationCap className="w-5 h-5 text-emerald-400" />
-            <span>EduCrédito UTB • Sistema Financiero Estudiantil</span>
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'var(--brand)' }}
+            >
+              <GraduationCap className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm font-semibold text-white">
+              EduCrédito UTB
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <a href="#simulador" className="hover:text-white transition">Calculadora</a>
-            <a href="#como-funciona" className="hover:text-white transition">Metodología</a>
-            <a href="#garante-interactivo" className="hover:text-white transition">Garantías</a>
-            <Link href="/login" className="hover:text-white transition font-semibold text-emerald-400">Portal Estudiantil</Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs" style={{ color: 'var(--ink-3)' }}>
+            <a href="#simulador" className="hover:text-white transition-colors">Calculadora</a>
+            <a href="#como-funciona" className="hover:text-white transition-colors">Metodología</a>
+            <a href="#garantias" className="hover:text-white transition-colors">Garantías</a>
+            <Link href="/login" className="hover:text-white transition-colors font-semibold" style={{ color: 'var(--brand)' }}>
+              Portal Estudiantil
+            </Link>
           </div>
 
-          <p className="text-slate-500 text-center sm:text-right">
-            © 2026 Universidad Técnica de Babahoyo (UTB). Todos los derechos reservados.
+          <p className="text-xs text-center sm:text-right" style={{ color: 'var(--ink-3)' }}>
+            © 2026 Universidad Técnica de Babahoyo (UTB)
           </p>
         </div>
       </footer>
+
     </div>
   );
 }

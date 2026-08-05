@@ -1,14 +1,24 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../contexts/AuthContext';
 import { ThemeProvider } from '../components/theme/ThemeProvider';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const geistSans = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+  display: 'swap',
+});
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'EduCrédito UTB | Fondo Estudiantil Universitario',
-  description: 'Plataforma oficial del Sistema Cooperativo Crediticio Estudiantil de la Universidad Técnica de Babahoyo (UTB). Microcréditos solidarios entre compañeros sin buró bancario.',
+  description: 'Plataforma oficial del Sistema Cooperativo Crediticio Estudiantil de la Universidad Técnica de Babahoyo. Microcréditos solidarios para estudiantes.',
 };
 
 export default function RootLayout({
@@ -18,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="transition-colors duration-300">
-      <body className={`${inter.variable} font-sans antialiased bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 selection:bg-emerald-500 selection:text-white`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider>
           <AuthProvider>
             {children}
